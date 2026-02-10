@@ -1,0 +1,3368 @@
+# 📊 FORMAL PROJECT REPORT
+
+**Project Title:** Distributed Banking Microservices Platform  
+**Report Date:** February 10, 2026  
+**Project Status:** Planning & Architecture Phase Complete  
+**Author:** Project Technical Lead  
+**Classification:** Internal Planning Document
+
+---
+
+## EXECUTIVE SUMMARY
+
+This report documents the complete planning, architecture decisions, and implementation strategy for a distributed banking microservices platform. The project objective is to build a production-grade, job-ready portfolio system demonstrating expertise in microservices architecture, financial systems, and modern DevOps practices.
+
+**Key Outcomes:**
+- Defined complete technical architecture for two core microservices
+- Established technology stack optimized for rapid development and cost efficiency
+- Created detailed 6-week implementation roadmap with measurable milestones
+- Identified critical technical challenges and proposed solutions
+- Developed interview preparation strategy and success metrics
+
+**Project Timeline:** 6 weeks (42 days)  
+**Target Completion Date:** March 24, 2026  
+**Estimated Budget:** $0-12 USD  
+**Primary Objective:** Secure employment in senior software engineering role
+
+---
+
+## TABLE OF CONTENTS
+
+1. [Project Background & Objectives](#1-project-background--objectives)
+2. [Requirements Analysis](#2-requirements-analysis)
+3. [Architecture & Design Decisions](#3-architecture--design-decisions)
+4. [Technology Stack Specification](#4-technology-stack-specification)
+5. [System Architecture](#5-system-architecture)
+6. [Implementation Plan](#6-implementation-plan)
+7. [Risk Assessment & Mitigation](#7-risk-assessment--mitigation)
+8. [Quality Assurance Strategy](#8-quality-assurance-strategy)
+9. [Deployment Strategy](#9-deployment-strategy)
+10. [Success Criteria & KPIs](#10-success-criteria--kpis)
+11. [Appendices](#11-appendices)
+
+---
+
+## 1. PROJECT BACKGROUND & OBJECTIVES
+
+### 1.1 Context
+
+The project stakeholder is a Principal Software Engineer seeking to demonstrate comprehensive expertise in distributed systems, financial services technology, and modern software development practices through a portfolio project.
+
+### 1.2 Primary Objective
+
+**Build a production-quality distributed banking system that serves as a compelling technical demonstration for senior-level job applications in the financial technology sector.**
+
+### 1.3 Success Definition
+
+Project success is measured by:
+- Securing employment in a senior software engineering role
+- Demonstrating mastery of production-grade software patterns
+- Creating a live, demonstrable system accessible during interviews
+- Completing implementation within 6-week timeframe
+
+### 1.4 Constraints Identified
+
+**Technical Constraints:**
+- Must be demonstrable in a 5-minute interview presentation
+- Must run on free-tier cloud infrastructure
+- Must be maintainable by a single developer
+
+**Business Constraints:**
+- Zero to minimal budget ($0-12 USD)
+- 6-week maximum timeline
+- Must be interview-ready, not production-deployed
+
+**Strategic Constraints:**
+- Must showcase senior-level technical decision-making
+- Must demonstrate understanding of production patterns without full production infrastructure
+- Must be explainable in interviews with clear architectural reasoning
+
+---
+
+## 2. REQUIREMENTS ANALYSIS
+
+### 2.1 Functional Requirements
+
+#### 2.1.1 Authentication Service Requirements
+
+| Requirement ID | Description | Priority | Complexity |
+|----------------|-------------|----------|------------|
+| AUTH-001 | User registration with email and password | P0 | Low |
+| AUTH-002 | User authentication with JWT token generation | P0 | Medium |
+| AUTH-003 | OAuth2/OIDC compliant authorization server | P0 | High |
+| AUTH-004 | Multi-factor authentication (TOTP) | P1 | Medium |
+| AUTH-005 | Session management with Redis | P0 | Medium |
+| AUTH-006 | Token refresh mechanism | P0 | Low |
+| AUTH-007 | Rate limiting on authentication endpoints | P1 | Medium |
+| AUTH-008 | Audit logging for all authentication events | P1 | Low |
+| AUTH-009 | Password complexity enforcement | P2 | Low |
+| AUTH-010 | Account lockout after failed attempts | P2 | Medium |
+
+#### 2.1.2 Banking Service Requirements
+
+| Requirement ID | Description | Priority | Complexity |
+|----------------|-------------|----------|------------|
+| BANK-001 | Account creation and management | P0 | Low |
+| BANK-002 | Deposit transaction processing | P0 | Medium |
+| BANK-003 | Withdrawal transaction processing | P0 | Medium |
+| BANK-004 | Transfer between accounts (P2P) | P0 | High |
+| BANK-005 | Double-entry ledger implementation | P0 | High |
+| BANK-006 | Transaction history with pagination | P0 | Low |
+| BANK-007 | Balance inquiry | P0 | Low |
+| BANK-008 | Idempotent transaction processing | P0 | High |
+| BANK-009 | Concurrent transaction safety | P0 | High |
+| BANK-010 | Integration with Auth service for authorization | P0 | Medium |
+
+### 2.2 Non-Functional Requirements
+
+#### 2.2.1 Performance Requirements
+
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| API Response Time (p95) | < 500ms | Load testing with Gatling |
+| Concurrent Users | 50+ simultaneous | Stress testing |
+| Database Query Performance | < 100ms average | Database monitoring |
+| Transaction Throughput | 10+ TPS | Load testing |
+
+#### 2.2.2 Reliability Requirements
+
+| Requirement | Target | Implementation |
+|-------------|--------|----------------|
+| Data Consistency | 100% (zero balance discrepancies) | ACID transactions, double-entry ledger |
+| Idempotency | 100% duplicate request handling | Redis-backed idempotency keys |
+| Error Recovery | Automatic retry with exponential backoff | Resilience4j circuit breaker |
+| Data Persistence | Zero data loss | PostgreSQL with transaction guarantees |
+
+#### 2.2.3 Security Requirements
+
+| Requirement | Implementation | Standard |
+|-------------|----------------|----------|
+| Authentication | OAuth2/OIDC with JWT | RFC 6749, RFC 7519 |
+| Password Storage | BCrypt hashing (cost factor 12) | OWASP guidelines |
+| MFA | TOTP (Time-based OTP) | RFC 6238 |
+| Transport Security | TLS 1.3 | Industry standard |
+| Session Management | Secure, HTTP-only cookies | OWASP guidelines |
+| Rate Limiting | Token bucket algorithm | Industry best practice |
+| Audit Logging | Immutable audit trail | Compliance requirement |
+
+#### 2.2.4 Code Quality Requirements
+
+| Metric | Target | Tool |
+|--------|--------|------|
+| Test Coverage | ≥ 80% | JaCoCo |
+| Code Duplication | < 5% | SonarQube |
+| Cyclomatic Complexity | < 15 per method | SonarQube |
+| Technical Debt Ratio | < 5% | SonarQube |
+| Security Vulnerabilities | Zero high/critical | Trivy, OWASP Dependency Check |
+
+### 2.3 Requirements Traceability
+
+All requirements are traceable to:
+- Source code modules
+- Test cases
+- Documentation
+- Architecture decisions
+
+Requirements management is maintained in GitLab Issues with labels: `functional`, `non-functional`, `P0`, `P1`, `P2`.
+
+---
+
+## 3. ARCHITECTURE & DESIGN DECISIONS
+
+### 3.1 Architectural Style: Microservices
+
+**Decision:** Implement a microservices architecture with two independent services.
+
+**Rationale:**
+1. **Separation of Concerns:** Authentication and banking business logic are distinct domains
+2. **Independent Scalability:** Services can scale based on different load patterns
+3. **Technology Flexibility:** Services can evolve independently
+4. **Fault Isolation:** Failure in one service doesn't cascade to others
+5. **Portfolio Value:** Demonstrates understanding of distributed systems
+
+**Tradeoffs:**
+- **Complexity:** Increased operational complexity vs. monolith
+- **Distributed Transactions:** Requires careful design for data consistency
+- **Network Latency:** Inter-service communication overhead
+- **Mitigation:** Accept complexity for learning value; implement proper patterns (saga, idempotency)
+
+### 3.2 Language & Framework Selection
+
+**Decision:** Java 21 with Spring Boot 3.4.2 for both services
+
+**Alternative Considered:** Polyglot architecture (Java for Auth, Python for Banking)
+
+**Rationale for Java-only:**
+
+| Factor | Java Spring Boot | Python FastAPI | Decision Weight |
+|--------|------------------|----------------|-----------------|
+| Type Safety | Compile-time checking | Runtime only | High |
+| Financial Precision | BigDecimal native | Requires decimal library | Critical |
+| Transaction Management | Spring @Transactional | Manual implementation | High |
+| Security Maturity | Spring Security (15+ years) | Newer ecosystem | High |
+| Development Speed | Moderate | Faster (initially) | Medium |
+| Maintainability | Single language stack | Multiple languages | High |
+| Hiring Perception | Industry standard for banking | Growing but less common | High |
+| Learning Curve | Moderate | Lower | Low |
+
+**Decision:** Prioritize production patterns, type safety, and industry alignment over polyglot demonstration.
+
+**Cost-Benefit Analysis:**
+- **Cost:** Less polyglot portfolio diversity
+- **Benefit:** Faster development (6 weeks vs. 8-10 weeks), fewer integration issues, stronger banking industry alignment
+
+### 3.3 Database Strategy
+
+**Decision:** PostgreSQL 16 for both services with separate schemas
+
+**Schema Isolation Strategy:**
+```sql
+-- Auth Service Schema
+CREATE SCHEMA auth;
+-- Tables: auth.users, auth.roles, auth.refresh_tokens, auth.audit_logs
+
+-- Banking Service Schema  
+CREATE SCHEMA banking;
+-- Tables: banking.accounts, banking.transactions, banking.ledger_entries
+```
+
+**Rationale:**
+1. **Logical Separation:** Simulates separate databases without infrastructure cost
+2. **Service Independence:** Each service owns its schema
+3. **Transaction Support:** ACID guarantees for financial operations
+4. **Cost Efficiency:** Single PostgreSQL instance on free tier
+5. **Migration Path:** Easy to split to separate databases in production
+
+**Production Evolution Path:**
+```
+Phase 1 (Current): Single PostgreSQL, separate schemas
+Phase 2 (Production): Separate RDS instances per service
+Phase 3 (Scale): Add read replicas, implement CQRS
+```
+
+### 3.4 Caching Strategy
+
+**Decision:** Redis 7.2 for session storage, rate limiting, and idempotency keys
+
+**Use Cases:**
+
+| Use Case | Data Structure | TTL | Justification |
+|----------|----------------|-----|---------------|
+| Session Storage | Hash | 15 minutes | Fast session lookup |
+| Rate Limiting | Sorted Set | 1 minute | Token bucket algorithm |
+| Idempotency Keys | String | 24 hours | Prevent duplicate transactions |
+| JWT Blacklist | Set | Token expiry | Token revocation |
+
+**Tradeoffs:**
+- **Pro:** In-memory performance, automatic expiration
+- **Con:** Data loss on Redis crash
+- **Mitigation:** Use Upstash managed Redis (free tier with persistence)
+
+### 3.5 Inter-Service Communication
+
+**Decision:** Synchronous REST APIs with JWT-based authentication
+
+**Communication Pattern:**
+```
+Client → Auth Service → JWT Token
+Client → Banking Service → Validate JWT with Auth Service
+```
+
+**Alternative Considered:** Message queue (Kafka) for async communication
+
+**Decision Matrix:**
+
+| Factor | REST (Chosen) | Kafka |
+|--------|---------------|-------|
+| Complexity | Low | High |
+| Development Time | Fast | Slow |
+| Debugging | Easy | Difficult |
+| Consistency | Strong (synchronous) | Eventual |
+| Infrastructure Cost | $0 | $0 (Upstash free tier) |
+| Portfolio Value | Moderate | High |
+| Scope Fit | Perfect for 2 services | Overkill |
+
+**Decision:** REST for initial implementation, document Kafka as future enhancement.
+
+**Interview Explanation Prepared:**
+> "I chose REST for direct service communication to minimize complexity with only two services. For event-driven workflows like notifications or fraud detection, I would introduce Kafka for async event streaming. The architecture supports this evolution - transaction events are already logged and could be published to Kafka topics."
+
+### 3.6 Authentication & Authorization Pattern
+
+**Decision:** OAuth2 Authorization Code flow with JWT tokens
+
+**Architecture:**
+```
+1. User → Auth Service: /oauth2/authorize
+2. Auth Service → User: Authorization code
+3. User → Auth Service: /oauth2/token (exchange code)
+4. Auth Service → User: JWT access token + refresh token
+5. User → Banking Service: API request with JWT
+6. Banking Service → Auth Service: Validate JWT (or use public key)
+7. Banking Service → User: API response
+```
+
+**Security Measures:**
+
+| Layer | Implementation | Standard |
+|-------|----------------|----------|
+| Password Storage | BCrypt (cost 12) | OWASP |
+| Token Signing | RS256 (asymmetric) | JWT best practice |
+| Token Expiry | 15 min (access), 7 days (refresh) | Industry standard |
+| MFA | TOTP (Google Authenticator) | RFC 6238 |
+| Rate Limiting | 5 attempts/min per IP | DDoS prevention |
+| Session Security | HTTP-only, Secure cookies | OWASP |
+
+### 3.7 Data Integrity Pattern: Double-Entry Ledger
+
+**Decision:** Implement double-entry accounting for all financial transactions
+
+**Ledger Design:**
+```sql
+CREATE TABLE banking.ledger_entries (
+    id UUID PRIMARY KEY,
+    transaction_id UUID NOT NULL,
+    account_id UUID NOT NULL,
+    entry_type VARCHAR(6) CHECK (entry_type IN ('DEBIT', 'CREDIT')),
+    amount DECIMAL(19,4) NOT NULL,
+    balance_after DECIMAL(19,4) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    idempotency_key VARCHAR(255) UNIQUE,
+    CONSTRAINT balance_non_negative CHECK (balance_after >= 0)
+);
+```
+
+**Transaction Flow:**
+```
+Transfer $100 from Account A to Account B:
+
+1. BEGIN TRANSACTION
+2. INSERT ledger_entry (account_a, DEBIT, 100)
+3. INSERT ledger_entry (account_b, CREDIT, 100)
+4. UPDATE account_a SET balance = balance - 100
+5. UPDATE account_b SET balance = balance + 100
+6. COMMIT TRANSACTION
+
+Invariant: SUM(DEBIT) = SUM(CREDIT) for all transactions
+```
+
+**Rationale:**
+1. **Audit Trail:** Immutable record of all financial movements
+2. **Reconciliation:** Can verify system integrity (debits = credits)
+3. **Compliance:** Required for regulatory reporting
+4. **Debugging:** Can trace every balance change
+5. **Portfolio Value:** Demonstrates understanding of financial systems
+
+### 3.8 Concurrency Control Strategy
+
+**Decision:** Pessimistic locking with SELECT FOR UPDATE
+
+**Problem:**
+```
+Race Condition Scenario:
+Account Balance: $100
+
+Thread 1: Transfer $80 to Alice
+Thread 2: Transfer $80 to Bob
+
+Both check balance ($100 ✓)
+Both execute transfer
+Final balance: -$60 ❌
+```
+
+**Solution:**
+```java
+@Transactional(isolation = Isolation.SERIALIZABLE)
+public TransactionResult transfer(TransferRequest request) {
+    // Pessimistic lock - other transactions wait
+    Account fromAccount = accountRepository
+        .findByIdForUpdate(request.getFromAccountId());
+    Account toAccount = accountRepository
+        .findByIdForUpdate(request.getToAccountId());
+    
+    // Validate balance
+    if (fromAccount.getBalance().compareTo(request.getAmount()) < 0) {
+        throw new InsufficientFundsException();
+    }
+    
+    // Execute transfer (ledger entries + balance updates)
+    executeTransfer(fromAccount, toAccount, request.getAmount());
+    
+    return TransactionResult.success();
+}
+```
+
+**SQL Implementation:**
+```sql
+-- Locks row until transaction completes
+SELECT * FROM accounts WHERE id = ? FOR UPDATE;
+```
+
+**Tradeoffs:**
+- **Pro:** Prevents all race conditions, simple to reason about
+- **Con:** Reduces concurrency (threads wait), potential deadlocks
+- **Mitigation:** Short transaction duration, proper lock ordering (always lock lower account_id first)
+
+**Performance Impact:** Acceptable for banking (correctness > throughput)
+
+### 3.9 Idempotency Implementation
+
+**Decision:** Redis-backed idempotency keys with 24-hour TTL
+
+**Implementation:**
+```java
+public TransactionResult processTransaction(TransactionRequest request) {
+    String idempotencyKey = request.getIdempotencyKey();
+    
+    // Check if already processed
+    if (redisTemplate.hasKey(idempotencyKey)) {
+        return redisTemplate.opsForValue().get(idempotencyKey);
+    }
+    
+    // Process transaction
+    TransactionResult result = executeTransaction(request);
+    
+    // Store result for 24 hours
+    redisTemplate.opsForValue()
+        .set(idempotencyKey, result, Duration.ofHours(24));
+    
+    return result;
+}
+```
+
+**Key Format:** `txn:{user_id}:{uuid}` (e.g., `txn:12345:a1b2c3d4`)
+
+**Rationale:**
+1. **Network Reliability:** Handle duplicate requests from client retries
+2. **Financial Safety:** Critical for money transfers (never double-charge)
+3. **User Experience:** Safe retry behavior
+4. **Performance:** Redis fast lookup (< 1ms)
+
+**Tradeoffs:**
+- **Pro:** Fast, automatic expiration, distributed (multiple app instances)
+- **Con:** Data lost if Redis crashes
+- **Mitigation:** Use managed Redis (Upstash) with persistence enabled
+
+---
+
+## 4. TECHNOLOGY STACK SPECIFICATION
+
+### 4.1 Backend Technology Stack
+
+#### 4.1.1 Core Framework
+
+| Component | Technology | Version | Justification |
+|-----------|-----------|---------|---------------|
+| **Runtime** | Java | 21 LTS | Latest LTS, 10+ years support, virtual threads |
+| **Framework** | Spring Boot | 3.4.2 | Industry standard, comprehensive ecosystem |
+| **Build Tool** | Maven | 3.9.x | Standard for Spring projects, reproducible builds |
+| **Package Structure** | Multi-module Maven | - | Separation: api, core, domain, integration modules |
+
+#### 4.1.2 Spring Boot Dependencies
+
+**Auth Service (pom.xml):**
+```xml
+<dependencies>
+    <!-- Core -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- OAuth2 Authorization Server -->
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-oauth2-authorization-server</artifactId>
+        <version>1.2.1</version>
+    </dependency>
+    
+    <!-- Security -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    
+    <!-- Database -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+    </dependency>
+    
+    <!-- Redis -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    
+    <!-- Validation -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    
+    <!-- Observability -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    
+    <!-- Resilience -->
+    <dependency>
+        <groupId>io.github.resilience4j</groupId>
+        <artifactId>resilience4j-spring-boot3</artifactId>
+        <version>2.2.0</version>
+    </dependency>
+    
+    <!-- Documentation -->
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>2.3.0</version>
+    </dependency>
+    
+    <!-- Testing -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>1.19.5</version>
+        <scope>test</scope>
+    </dependency>
+    
+    <!-- Utilities -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+```
+
+**Banking Service (pom.xml):**
+```xml
+<dependencies>
+    <!-- Core -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- Database with Transaction Support -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+    </dependency>
+    
+    <!-- Redis for Idempotency -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    
+    <!-- OAuth2 Resource Server (JWT validation) -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+    
+    <!-- Resilience & Circuit Breaker -->
+    <dependency>
+        <groupId>io.github.resilience4j</groupId>
+        <artifactId>resilience4j-spring-boot3</artifactId>
+        <version>2.2.0</version>
+    </dependency>
+    
+    <!-- HTTP Client for Auth Service -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    
+    <!-- All other dependencies same as Auth Service -->
+</dependencies>
+```
+
+### 4.2 Data Tier Technology Stack
+
+#### 4.2.1 Primary Database
+
+| Component | Technology | Version | Configuration |
+|-----------|-----------|---------|---------------|
+| **Database** | PostgreSQL | 16 | ACID compliance, JSON support |
+| **Provider** | Neon | Latest | Free tier: 500MB storage, 5 compute hours/day |
+| **Migration Tool** | Flyway | 9.x | Version-controlled schema changes |
+| **Connection Pool** | HikariCP | Built-in | Spring Boot default (fast, reliable) |
+
+**PostgreSQL Configuration:**
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Never auto-create in production
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: false
+  flyway:
+    enabled: true
+    schemas: auth,banking
+    baseline-on-migrate: true
+```
+
+#### 4.2.2 Cache Layer
+
+| Component | Technology | Version | Configuration |
+|-----------|-----------|---------|---------------|
+| **Cache** | Redis | 7.2 | In-memory data store |
+| **Provider** | Upstash | Latest | Free tier: 10K commands/day |
+| **Client** | Lettuce | Built-in | Spring Boot default (async, thread-safe) |
+
+**Redis Configuration:**
+```yaml
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      ssl: true
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+```
+
+### 4.3 Infrastructure & DevOps Stack
+
+#### 4.3.1 Containerization
+
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| **Container Runtime** | Docker | 24.x | Application containerization |
+| **Orchestration (Local)** | Docker Compose | 2.24.x | Multi-container local development |
+| **Base Image** | Eclipse Temurin | 21-jre-alpine | Minimal JRE image (~80MB) |
+
+**Dockerfile (Multi-stage Build):**
+```dockerfile
+# Build stage
+FROM eclipse-temurin:21-jdk-alpine AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# Runtime stage
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+#### 4.3.2 Deployment Platform
+
+| Component | Technology | Version | Capacity |
+|-----------|-----------|---------|----------|
+| **Platform** | Railway | Latest | Free tier: 512MB RAM, 1GB storage per service |
+| **Scaling** | Horizontal | - | Auto-scale based on requests (Railway managed) |
+| **SSL/TLS** | Automatic | - | Let's Encrypt certificates (Railway provided) |
+
+**Railway Configuration:**
+```json
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+#### 4.3.3 CI/CD Pipeline
+
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| **CI Platform** | GitHub Actions | Latest | Free tier: 2000 minutes/month |
+| **Build Tool** | Maven | 3.9.x | Compile, test, package |
+| **Code Quality** | SonarQube | Community | Static analysis, coverage |
+| **Security Scan** | Trivy | 0.49.x | Container vulnerability scanning |
+
+**GitHub Actions Workflow:**
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+      - name: Run tests
+        run: mvn clean test
+      - name: Generate coverage
+        run: mvn jacoco:report
+      
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL,HIGH'
+  
+  build-and-deploy:
+    needs: [test, security-scan]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t auth-service .
+      - name: Deploy to Railway
+        run: railway up
+```
+
+### 4.4 Observability Stack
+
+#### 4.4.1 Metrics & Monitoring
+
+| Component | Technology | Version | Metrics Collected |
+|-----------|-----------|---------|-------------------|
+| **Metrics Library** | Micrometer | Built-in | JVM, HTTP, custom business metrics |
+| **Metrics Format** | Prometheus | 2.x | Time-series metrics |
+| **Metrics Endpoint** | Spring Actuator | Built-in | `/actuator/metrics`, `/actuator/prometheus` |
+
+**Metrics Configuration:**
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
+```
+
+**Custom Business Metrics:**
+```java
+@Component
+public class TransactionMetrics {
+    private final Counter transactionCounter;
+    private final Timer transactionTimer;
+    
+    public TransactionMetrics(MeterRegistry registry) {
+        this.transactionCounter = Counter.builder("transactions.total")
+            .tag("type", "transfer")
+            .register(registry);
+        
+        this.transactionTimer = Timer.builder("transactions.duration")
+            .register(registry);
+    }
+}
+```
+
+#### 4.4.2 Logging
+
+| Component | Technology | Version | Format |
+|-----------|-----------|---------|--------|
+| **Logging Framework** | Logback | Built-in | JSON structured logs |
+| **Log Encoder** | Logstash Encoder | 7.4 | JSON format for parsing |
+| **Log Level** | INFO (prod), DEBUG (dev) | - | Configurable per package |
+
+**Logback Configuration:**
+```xml
+<configuration>
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <includeContext>false</includeContext>
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <message>message</message>
+                <logger>logger</logger>
+                <level>level</level>
+            </fieldNames>
+        </encoder>
+    </appender>
+    
+    <root level="INFO">
+        <appender-ref ref="JSON"/>
+    </root>
+</configuration>
+```
+
+### 4.5 Testing Stack
+
+| Testing Type | Technology | Version | Coverage Target |
+|--------------|-----------|---------|-----------------|
+| **Unit Testing** | JUnit 5 | 5.10.x | 80%+ |
+| **Mocking** | Mockito | 5.10.x | Service layer |
+| **Integration Testing** | Spring Boot Test | Built-in | Controller + Repository |
+| **Container Testing** | Testcontainers | 1.19.5 | Real PostgreSQL, Redis |
+| **API Testing** | REST Assured | 5.4.x | End-to-end API flows |
+| **Coverage Reporting** | JaCoCo | 0.8.11 | Line + branch coverage |
+| **Load Testing** | Gatling | 3.10.x | Performance validation |
+
+**Testing Dependencies:**
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>1.19.5</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>1.19.5</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+### 4.6 Frontend Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| **Build Tool** | Vite | 5.x | Fast development server, optimized builds |
+| **Framework** | React | 18.x | Component-based UI |
+| **Styling** | Tailwind CSS | 3.x | Utility-first CSS, rapid styling |
+| **State Management** | React Query (TanStack) | 5.x | Server state, caching, API calls |
+| **Routing** | React Router | 6.x | Client-side navigation |
+| **HTTP Client** | Axios | 1.x | API requests with interceptors |
+| **Deployment** | Vercel | Latest | Free tier, automatic GitHub deploys |
+
+**Frontend Pages (4 total):**
+
+| Page | Route | Features |
+|------|-------|----------|
+| **Login** | `/login` | Email/password form, JWT storage in memory, redirect to dashboard |
+| **Dashboard** | `/dashboard` | Account list, balance display, quick actions |
+| **Transfer** | `/transfer` | Transfer form, idempotency key generation, confirmation |
+| **Transactions** | `/transactions` | Transaction history, pagination, filtering |
+
+**Frontend Project Structure:**
+```
+frontend/
+├── src/
+│   ├── components/        # Reusable UI components
+│   ├── pages/             # Page components (Login, Dashboard, etc.)
+│   ├── hooks/             # Custom hooks (useAuth, useAccounts)
+│   ├── services/          # API service layer
+│   ├── context/           # Auth context provider
+│   └── utils/             # Helpers (idempotency key generation)
+├── tailwind.config.js
+├── vite.config.ts
+└── package.json
+```
+
+**Interview Value:**
+- Opens demo with "Let me show you the live system" → browser → clicks
+- Allows interviewers to interact with the system during the call
+- Demonstrates full-stack capability (backend strength + frontend competence)
+
+---
+
+### 4.7 Documentation Stack
+
+| Component | Technology | Version | Output |
+|-----------|-----------|---------|--------|
+| **API Documentation** | SpringDoc OpenAPI | 2.3.0 | Swagger UI at `/swagger-ui.html` |
+| **OpenAPI Spec** | OpenAPI 3.0 | 3.0.x | JSON/YAML spec file |
+| **API Testing** | Postman | Latest | Importable collection |
+| **Architecture Diagrams** | Draw.io / Excalidraw | - | PNG/SVG exports |
+
+**OpenAPI Configuration:**
+```java
+@Configuration
+public class OpenAPIConfig {
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("Banking Microservices API")
+                .version("1.0.0")
+                .description("Production-grade distributed banking system"));
+    }
+}
+```
+
+### 4.8 Development Tools
+
+| Tool | Purpose | Version |
+|------|---------|---------|
+| **IDE** | IntelliJ IDEA | 2024.1+ |
+| **JDK Management** | SDKMAN! | Latest |
+| **Database Client** | DBeaver | Latest |
+| **API Client** | Postman | Latest |
+| **Version Control** | Git | 2.43+ |
+| **Container Management** | Docker Desktop | 24.x |
+
+### 4.9 Technology Stack Summary
+
+**Complete Dependency Tree:**
+```
+Backend Services (Both)
+├── Java 21 LTS
+├── Spring Boot 3.4.2
+│   ├── Spring Web
+│   ├── Spring Security
+│   ├── Spring Data JPA
+│   ├── Spring Data Redis
+│   └── Spring Actuator
+├── PostgreSQL 16 (Neon)
+├── Redis 7.2 (Upstash)
+├── Flyway 9.x
+└── Resilience4j 2.2.0
+
+Auth Service Specific
+└── Spring Authorization Server 1.2.1
+
+Testing
+├── JUnit 5.10.x
+├── Mockito 5.10.x
+├── Testcontainers 1.19.5
+├── REST Assured 5.4.x
+└── Gatling 3.10.x
+
+Infrastructure
+├── Docker 24.x
+├── Docker Compose 2.24.x
+├── GitHub Actions
+└── Railway (deployment)
+
+Observability
+├── Micrometer (metrics)
+├── Prometheus format
+└── Logback (JSON logs)
+
+Frontend (Demo UI)
+├── Vite 5.x
+├── React 18.x
+├── Tailwind CSS 3.x
+├── React Query 5.x
+├── React Router 6.x
+└── Vercel (deployment)
+
+Documentation
+├── SpringDoc OpenAPI 2.3.0
+└── Postman Collections
+```
+
+**Total Technology Count:** 31 core technologies (25 backend + 6 frontend)
+**Estimated Learning Curve:** 2-3 days for new technologies (minimal, mostly Spring ecosystem)
+**Development Environment Size:** ~5GB (JDK, IDE, Docker images)
+
+---
+
+## 5. SYSTEM ARCHITECTURE
+
+### 5.1 High-Level Architecture Diagram
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                            │
+├────────────────────────────────────────────────────────────────┤
+│  Web Browser / Postman / Mobile App (Future)                  │
+│  - HTTPS/TLS 1.3                                               │
+│  - JWT Bearer Token Authentication                             │
+└────────────────────────────────────────────────────────────────┘
+                              │
+                              │ HTTPS
+                              ▼
+┌────────────────────────────────────────────────────────────────┐
+│                    APPLICATION LAYER                           │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌──────────────────────┐      ┌──────────────────────┐      │
+│  │   AUTH SERVICE       │      │   BANKING SERVICE    │      │
+│  │   Port: 8080         │      │   Port: 8081         │      │
+│  ├──────────────────────┤      ├──────────────────────┤      │
+│  │ • User Registration  │      │ • Account Mgmt       │      │
+│  │ • OAuth2 Server      │◄─────┤ • Transaction Proc   │      │
+│  │ • JWT Generation     │ JWT  │ • Transfer Logic     │      │
+│  │ • MFA (TOTP)         │Valid │ • Balance Inquiry    │      │
+│  │ • Session Mgmt       │      │ • Ledger Mgmt        │      │
+│  │ • Rate Limiting      │      │ • Idempotency        │      │
+│  │ • Audit Logging      │      │ • Concurrency Ctrl   │      │
+│  └──────────────────────┘      └──────────────────────┘      │
+│           │                              │                     │
+└───────────┼──────────────────────────────┼────────────────────┘
+            │                              │
+            │                              │
+            ▼                              ▼
+┌────────────────────────────────────────────────────────────────┐
+│                        DATA LAYER                              │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌─────────────────────────────────────────────────────┐      │
+│  │            PostgreSQL 16 (Neon)                     │      │
+│  ├─────────────────────────────────────────────────────┤      │
+│  │  Schema: auth                │  Schema: banking     │      │
+│  │  ├─ users                    │  ├─ accounts         │      │
+│  │  ├─ roles                    │  ├─ transactions     │      │
+│  │  ├─ user_roles               │  ├─ ledger_entries   │      │
+│  │  ├─ refresh_tokens           │  └─ (indexes)        │      │
+│  │  └─ audit_logs               │                      │      │
+│  └─────────────────────────────────────────────────────┘      │
+│                                                                │
+│  ┌─────────────────────────────────────────────────────┐      │
+│  │            Redis 7.2 (Upstash)                      │      │
+│  ├─────────────────────────────────────────────────────┤      │
+│  │  • Session Store (Hash, TTL: 15min)                 │      │
+│  │  • Rate Limit Counters (Sorted Set, TTL: 1min)      │      │
+│  │  • Idempotency Keys (String, TTL: 24h)              │      │
+│  │  • JWT Blacklist (Set, TTL: token expiry)           │      │
+│  └─────────────────────────────────────────────────────┘      │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+            │                              │
+            │                              │
+            ▼                              ▼
+┌────────────────────────────────────────────────────────────────┐
+│                   OBSERVABILITY LAYER                          │
+├────────────────────────────────────────────────────────────────┤
+│  • Metrics: Spring Actuator + Micrometer (Prometheus format)  │
+│  • Logs: Structured JSON (Logback + Logstash Encoder)         │
+│  • Health Checks: /actuator/health, /actuator/ready           │
+│  • Business Metrics: Transaction count, success rate, latency │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### 5.2 Service Interaction Flow
+
+#### 5.2.1 User Registration & Authentication Flow
+
+```
+┌─────┐                ┌──────────┐              ┌──────────┐
+│User │                │  Auth    │              │PostgreSQL│
+│     │                │ Service  │              │  (auth)  │
+└──┬──┘                └────┬─────┘              └────┬─────┘
+   │                        │                         │
+   │ POST /auth/register    │                         │
+   │ {email, password}      │                         │
+   ├───────────────────────►│                         │
+   │                        │                         │
+   │                        │ 1. Validate input       │
+   │                        │    (email format, pwd)  │
+   │                        │                         │
+   │                        │ 2. Hash password        │
+   │                        │    (BCrypt cost=12)     │
+   │                        │                         │
+   │                        │ 3. INSERT INTO users    │
+   │                        ├────────────────────────►│
+   │                        │                         │
+   │                        │ 4. User created         │
+   │                        │◄────────────────────────┤
+   │                        │                         │
+   │ 201 Created            │                         │
+   │ {userId, email}        │                         │
+   │◄───────────────────────┤                         │
+   │                        │                         │
+   │ POST /auth/login       │                         │
+   │ {email, password}      │                         │
+   ├───────────────────────►│                         │
+   │                        │                         │
+   │                        │ 5. SELECT user          │
+   │                        ├────────────────────────►│
+   │                        │◄────────────────────────┤
+   │                        │                         │
+   │                        │ 6. Verify password      │
+   │                        │    (BCrypt.check)       │
+   │                        │                         │
+   │                        ├──┐                      │
+   │                        │  │ 7. Generate JWT      │
+   │                        │  │    - Access (15min)  │
+   │                        │  │    - Refresh (7days) │
+   │                        │◄─┘                      │
+   │                        │                         │
+   │                        │ 8. Store refresh token  │
+   │                        ├────────────────────────►│
+   │                        │                         │
+   │                        │ 9. Create session (Redis)
+   │                        │                         │
+   │ 200 OK                 │                         │
+   │ {accessToken,          │                         │
+   │  refreshToken}         │                         │
+   │◄───────────────────────┤                         │
+   │                        │                         │
+```
+
+#### 5.2.2 Banking Transaction Flow (Transfer)
+
+```
+┌────┐  ┌────────┐  ┌────────┐  ┌──────┐  ┌──────────┐
+│User│  │Banking │  │  Auth  │  │Redis │  │PostgreSQL│
+│    │  │Service │  │Service │  │      │  │ (banking)│
+└─┬──┘  └───┬────┘  └───┬────┘  └──┬───┘  └────┬─────┘
+  │         │            │          │           │
+  │ POST /transfers      │          │           │
+  │ {from, to, amount}   │          │           │
+  │ Authorization: JWT   │          │           │
+  ├─────────────────────►│          │           │
+  │         │            │          │           │
+  │         │ 1. Validate JWT       │           │
+  │         ├───────────►│          │           │
+  │         │◄───────────┤          │           │
+  │         │            │          │           │
+  │         │ 2. Check idempotency  │           │
+  │         ├──────────────────────►│           │
+  │         │      Key exists?      │           │
+  │         │◄──────────────────────┤           │
+  │         │                       │           │
+  │         │ 3. BEGIN TRANSACTION  │           │
+  │         ├──────────────────────────────────►│
+  │         │                       │           │
+  │         │ 4. SELECT accounts FOR UPDATE     │
+  │         ├──────────────────────────────────►│
+  │         │      (Pessimistic lock)           │
+  │         │◄──────────────────────────────────┤
+  │         │                       │           │
+  │         ├─┐ 5. Validate:        │           │
+  │         │ │    - Sufficient funds           │
+  │         │ │    - Accounts active            │
+  │         │ │    - from ≠ to                  │
+  │         │◄┘                     │           │
+  │         │                       │           │
+  │         │ 6. INSERT ledger_entry (DEBIT)    │
+  │         ├──────────────────────────────────►│
+  │         │                       │           │
+  │         │ 7. INSERT ledger_entry (CREDIT)   │
+  │         ├──────────────────────────────────►│
+  │         │                       │           │
+  │         │ 8. UPDATE account balances        │
+  │         ├──────────────────────────────────►│
+  │         │                       │           │
+  │         │ 9. INSERT transaction record      │
+  │         ├──────────────────────────────────►│
+  │         │                       │           │
+  │         │ 10. COMMIT TRANSACTION            │
+  │         ├──────────────────────────────────►│
+  │         │◄──────────────────────────────────┤
+  │         │                       │           │
+  │         │ 11. Store idempotency result      │
+  │         ├──────────────────────►│           │
+  │         │    (TTL: 24h)         │           │
+  │         │                       │           │
+  │ 200 OK  │                       │           │
+  │ {transactionId,                │           │
+  │  status: COMPLETED}            │           │
+  │◄────────┤                       │           │
+  │         │                       │           │
+```
+
+### 5.3 Data Model
+
+#### 5.3.1 Auth Service Schema
+
+```sql
+-- Schema: auth
+
+CREATE TABLE auth.users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    mfa_enabled BOOLEAN DEFAULT FALSE,
+    mfa_secret VARCHAR(255),
+    account_locked BOOLEAN DEFAULT FALSE,
+    failed_login_attempts INT DEFAULT 0,
+    last_login_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE auth.roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE auth.user_roles (
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    role_id UUID NOT NULL REFERENCES auth.roles(id) ON DELETE CASCADE,
+    assigned_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, role_id)
+);
+
+CREATE TABLE auth.refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    token VARCHAR(500) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    revoked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE auth.audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSONB,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    success BOOLEAN NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_users_email ON auth.users(email);
+CREATE INDEX idx_refresh_tokens_user_id ON auth.refresh_tokens(user_id);
+CREATE INDEX idx_refresh_tokens_token ON auth.refresh_tokens(token);
+CREATE INDEX idx_audit_logs_user_id ON auth.audit_logs(user_id);
+CREATE INDEX idx_audit_logs_created_at ON auth.audit_logs(created_at DESC);
+CREATE INDEX idx_audit_logs_event_type ON auth.audit_logs(event_type);
+```
+
+#### 5.3.2 Banking Service Schema
+
+**Cross-Service Referential Integrity (Foreign Data Wrapper):**
+
+```sql
+-- Enable Foreign Data Wrapper extension
+CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+
+-- Create connection to Auth database (production: separate database)
+-- For demo: same database, different schema - FDW still demonstrates the pattern
+CREATE SERVER auth_server
+    FOREIGN DATA WRAPPER postgres_fdw
+    OPTIONS (host 'auth-db.neon.tech', dbname 'auth_db', port '5432');
+
+-- Create user mapping for authentication
+CREATE USER MAPPING FOR banking_user
+    SERVER auth_server
+    OPTIONS (user 'auth_readonly', password '${AUTH_DB_PASSWORD}');
+
+-- Create foreign table to reference auth.users
+CREATE FOREIGN TABLE banking.auth_users (
+    id UUID,
+    email VARCHAR(255),
+    created_at TIMESTAMP
+) SERVER auth_server OPTIONS (schema_name 'auth', table_name 'users');
+
+-- Now accounts.user_id can reference the foreign table
+-- This maintains referential integrity across service boundaries
+```
+
+**Interview Story:**
+> "I used PostgreSQL foreign data wrappers to maintain referential integrity across services while preserving data ownership boundaries. The banking service can validate that a user exists in the auth service without coupling the schemas. In production with separate databases, this pattern scales—each service owns its data, but cross-service references are still validated."
+
+```sql
+-- Schema: banking
+
+CREATE TABLE banking.accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,  -- Validated against banking.auth_users via FDW
+    account_number VARCHAR(20) NOT NULL UNIQUE,
+    account_type VARCHAR(20) NOT NULL CHECK (account_type IN ('SAVINGS', 'CHECKING')),
+    balance DECIMAL(19,4) NOT NULL DEFAULT 0.0000 CHECK (balance >= 0),
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'FROZEN', 'CLOSED')),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    version BIGINT NOT NULL DEFAULT 0  -- Optimistic locking
+);
+
+CREATE TABLE banking.transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id UUID NOT NULL REFERENCES banking.accounts(id),
+    transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER')),
+    amount DECIMAL(19,4) NOT NULL CHECK (amount > 0),
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+    status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED', 'REVERSED')),
+    description TEXT,
+    metadata JSONB,  -- Flexible data (e.g., transfer details)
+    idempotency_key VARCHAR(255) UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMP
+);
+
+CREATE TABLE banking.ledger_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    transaction_id UUID NOT NULL REFERENCES banking.transactions(id),
+    account_id UUID NOT NULL REFERENCES banking.accounts(id),
+    entry_type VARCHAR(6) NOT NULL CHECK (entry_type IN ('DEBIT', 'CREDIT')),
+    amount DECIMAL(19,4) NOT NULL CHECK (amount > 0),
+    balance_after DECIMAL(19,4) NOT NULL CHECK (balance_after >= 0),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_accounts_user_id ON banking.accounts(user_id);
+CREATE INDEX idx_accounts_account_number ON banking.accounts(account_number);
+CREATE INDEX idx_transactions_account_id ON banking.transactions(account_id);
+CREATE INDEX idx_transactions_created_at ON banking.transactions(created_at DESC);
+CREATE INDEX idx_transactions_idempotency_key ON banking.transactions(idempotency_key);
+CREATE INDEX idx_ledger_account_created ON banking.ledger_entries(account_id, created_at DESC);
+CREATE INDEX idx_ledger_transaction ON banking.ledger_entries(transaction_id);
+
+-- Integrity Check Function (for reconciliation)
+CREATE OR REPLACE FUNCTION banking.check_ledger_balance() 
+RETURNS TABLE(account_id UUID, ledger_balance DECIMAL, account_balance DECIMAL, difference DECIMAL) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        a.id,
+        COALESCE(SUM(CASE WHEN l.entry_type = 'CREDIT' THEN l.amount ELSE -l.amount END), 0) AS ledger_balance,
+        a.balance AS account_balance,
+        a.balance - COALESCE(SUM(CASE WHEN l.entry_type = 'CREDIT' THEN l.amount ELSE -l.amount END), 0) AS difference
+    FROM banking.accounts a
+    LEFT JOIN banking.ledger_entries l ON a.id = l.account_id
+    GROUP BY a.id, a.balance
+    HAVING ABS(a.balance - COALESCE(SUM(CASE WHEN l.entry_type = 'CREDIT' THEN l.amount ELSE -l.amount END), 0)) > 0.0001;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### 5.4 API Specification
+
+#### 5.4.1 Auth Service API
+
+**Base URL:** `https://auth-service.railway.app/api/v1`
+
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/auth/register` | POST | Register new user | No |
+| `/auth/login` | POST | Authenticate user, get JWT | No |
+| `/auth/refresh` | POST | Refresh access token | Refresh Token |
+| `/auth/logout` | POST | Revoke refresh token | JWT |
+| `/auth/mfa/enable` | POST | Enable MFA for user | JWT |
+| `/auth/mfa/verify` | POST | Verify MFA code during login | No |
+| `/users/me` | GET | Get current user profile | JWT |
+| `/users/me` | PUT | Update user profile | JWT |
+| `/health` | GET | Health check | No |
+| `/actuator/prometheus` | GET | Prometheus metrics | No |
+
+**Sample Request/Response:**
+
+```json
+// POST /auth/register
+Request:
+{
+  "email": "alice@example.com",
+  "password": "SecureP@ssw0rd",
+  "firstName": "Alice",
+  "lastName": "Johnson"
+}
+
+Response: 201 Created
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "alice@example.com",
+  "createdAt": "2026-02-10T10:30:00Z"
+}
+
+// POST /auth/login
+Request:
+{
+  "email": "alice@example.com",
+  "password": "SecureP@ssw0rd"
+}
+
+Response: 200 OK
+{
+  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
+  "expiresIn": 900,
+  "tokenType": "Bearer"
+}
+```
+
+#### 5.4.2 Banking Service API
+
+**Base URL:** `https://banking-service.railway.app/api/v1`
+
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/accounts` | POST | Create new account | JWT |
+| `/accounts` | GET | List user's accounts | JWT |
+| `/accounts/{id}` | GET | Get account details | JWT |
+| `/accounts/{id}/balance` | GET | Get account balance | JWT |
+| `/accounts/{id}/deposit` | POST | Deposit money | JWT |
+| `/accounts/{id}/withdraw` | POST | Withdraw money | JWT |
+| `/transfers` | POST | Transfer between accounts | JWT |
+| `/transactions` | GET | List user's transactions | JWT |
+| `/transactions/{id}` | GET | Get transaction details | JWT |
+| `/health` | GET | Health check | No |
+| `/actuator/prometheus` | GET | Prometheus metrics | No |
+
+**Sample Request/Response:**
+
+```json
+// POST /accounts
+Request:
+Headers: {Authorization: "Bearer eyJhbGc..."}
+{
+  "accountType": "SAVINGS",
+  "currency": "USD"
+}
+
+Response: 201 Created
+{
+  "accountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "accountNumber": "ACC1234567890",
+  "accountType": "SAVINGS",
+  "balance": 0.0000,
+  "currency": "USD",
+  "status": "ACTIVE",
+  "createdAt": "2026-02-10T10:35:00Z"
+}
+
+// POST /transfers
+Request:
+Headers: {
+  Authorization: "Bearer eyJhbGc...",
+  Idempotency-Key: "txn:550e8400:a1b2c3d4"
+}
+{
+  "fromAccountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "toAccountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+  "amount": 100.50,
+  "currency": "USD",
+  "description": "Transfer to savings"
+}
+
+Response: 200 OK
+{
+  "transactionId": "9e1g8891-9647-62fg-b66d-g29he3h12cg9",
+  "status": "COMPLETED",
+  "fromAccount": {
+    "accountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "balanceAfter": 899.50
+  },
+  "toAccount": {
+    "accountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+    "balanceAfter": 100.50
+  },
+  "amount": 100.50,
+  "completedAt": "2026-02-10T10:40:15Z"
+}
+```
+
+### 5.5 Security Architecture
+
+#### 5.5.1 Authentication Flow
+
+```
+1. User submits credentials to Auth Service
+2. Auth Service validates credentials
+3. If MFA enabled, request TOTP code
+4. Generate JWT (RS256 signed)
+   - Access Token: 15 min expiry, contains: userId, email, roles
+   - Refresh Token: 7 days expiry, stored in database
+5. Return tokens to client
+6. Client stores access token (memory), refresh token (secure cookie)
+7. Client includes access token in Authorization header for API calls
+8. Banking Service validates JWT signature using Auth Service public key
+9. Banking Service extracts userId from JWT claims
+10. Banking Service authorizes request based on userId
+```
+
+#### 5.5.2 JWT Structure
+
+```json
+// Header
+{
+  "alg": "RS256",
+  "typ": "JWT"
+}
+
+// Payload
+{
+  "sub": "550e8400-e29b-41d4-a716-446655440000",  // userId
+  "email": "alice@example.com",
+  "roles": ["USER"],
+  "iat": 1707561000,  // Issued at
+  "exp": 1707561900,  // Expires at (15 min later)
+  "iss": "https://auth-service.railway.app"  // Issuer
+}
+
+// Signature
+RSASHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  privateKey
+)
+```
+
+#### 5.5.3 Security Layers
+
+| Layer | Protection | Implementation |
+|-------|------------|----------------|
+| **Transport** | HTTPS/TLS 1.3 | Railway automatic SSL |
+| **Authentication** | OAuth2 + JWT | Spring Authorization Server |
+| **Authorization** | Role-based (RBAC) | Spring Security |
+| **Password** | BCrypt hashing (cost 12) | Spring Security PasswordEncoder |
+| **MFA** | TOTP (30-sec window) | Google Authenticator compatible |
+| **Session** | Server-side in Redis | Spring Session |
+| **Rate Limiting** | Token bucket (5/min login) | Redis counters |
+| **Input Validation** | Bean Validation | Hibernate Validator |
+| **SQL Injection** | Parameterized queries | JPA/Hibernate |
+| **CSRF** | Not applicable (stateless API) | N/A |
+| **CORS** | Restricted origins | Spring Security CORS config |
+
+---
+
+## 6. IMPLEMENTATION PLAN
+
+### 6.1 Project Timeline Overview
+
+**Total Duration:** 6 weeks (42 days)  
+**Estimated Effort:** 15-20 hours/week  
+**Total Hours:** 90-120 hours
+
+```
+Week 1-2: Auth Service Development (30-35 hours)
+Week 3-4: Banking Service Development (35-40 hours)
+Week 5: Integration, Testing & Documentation (15-20 hours)
+Week 6: Deployment & Job Application Launch (10-15 hours)
+```
+
+### 6.2 Detailed Week-by-Week Breakdown
+
+#### **WEEK 1: Auth Service Foundation (Days 1-7)**
+
+**Objectives:**
+- Setup development environment
+- Implement core authentication (registration, login, JWT)
+- Database schema and migrations
+- Basic testing
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 1** | • Install JDK 21, Maven, Docker<br>• Create GitHub repository<br>• Initialize Spring Boot project (Spring Initializr)<br>• Setup project structure (multi-module Maven)<br>• Configure PostgreSQL (Docker Compose)<br>• Configure Redis (Docker Compose) | • Project compiles<br>• Local databases running<br>• README with setup instructions | 4-5 |
+| **Day 2** | • Create Flyway migration scripts (users, roles tables)<br>• Define JPA entities (User, Role)<br>• Create repositories (UserRepository, RoleRepository)<br>• Configure application.yml (database, Redis)<br>• Test database connection | • Database schema created<br>• Entities mapped correctly<br>• Repository tests passing | 4-5 |
+| **Day 3** | • Implement UserService (registration logic)<br>• Configure BCrypt password encoder<br>• Create UserController (POST /auth/register)<br>• Add input validation (@Valid, custom validators)<br>• Create DTOs (RegisterRequest, UserResponse) | • Registration endpoint working<br>• Password hashed in database<br>• Validation errors returned properly | 4-5 |
+| **Day 4** | • Implement login logic in UserService<br>• Create AuthController (POST /auth/login)<br>• Configure Spring Security (permit /auth/**, secure others)<br>• Add error handling (GlobalExceptionHandler)<br>• Test login flow with Postman | • Login endpoint working<br>• Returns proper error codes<br>• Security configuration working | 4-5 |
+| **Day 5** | • Add JWT library (jjwt)<br>• Create JwtService (generate, validate, extract claims)<br>• Update login to return JWT tokens<br>• Configure JWT signing keys (RS256)<br>• Create RefreshToken entity and repository | • Login returns access + refresh tokens<br>• Tokens are valid RS256 JWT<br>• Tokens stored in database | 4-5 |
+| **Day 6** | • Implement JWT authentication filter<br>• Configure Spring Security for JWT validation<br>• Create protected endpoint (GET /users/me)<br>• Test authentication flow end-to-end<br>• Add rate limiting (Redis-backed) | • Protected endpoints require JWT<br>• Invalid tokens rejected (401)<br>• Rate limiting working | 4-5 |
+| **Day 7** | • Write unit tests (UserService, JwtService)<br>• Write integration tests (Testcontainers)<br>• Setup JaCoCo for coverage<br>• Fix bugs found in testing<br>• Update documentation | • 80%+ test coverage<br>• All tests passing<br>• CI pipeline configured | 4-5 |
+
+**Week 1 Deliverables:**
+- ✅ Auth service running locally
+- ✅ Registration and login working
+- ✅ JWT tokens generated and validated
+- ✅ 80%+ test coverage
+- ✅ Postman collection created
+
+---
+
+#### **WEEK 2: Auth Service Advanced Features (Days 8-14)**
+
+**Objectives:**
+- Implement MFA (TOTP)
+- Add audit logging
+- Implement token refresh flow
+- Deploy to Railway
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 8** | • Add TOTP library (Google Authenticator compatible)<br>• Create MFA setup endpoint (POST /auth/mfa/enable)<br>• Generate QR code for TOTP secret<br>• Store MFA secret in database (encrypted) | • MFA setup endpoint working<br>• QR code generated<br>• TOTP secret stored | 3-4 |
+| **Day 9** | • Implement MFA verification (POST /auth/mfa/verify)<br>• Update login flow to check MFA status<br>• Add backup codes generation<br>• Test MFA with Google Authenticator app | • MFA verification working<br>• Login requires MFA if enabled<br>• Backup codes work | 3-4 |
+| **Day 10** | • Create AuditLog entity and repository<br>• Implement AuditLogService<br>• Add audit logging to all auth events<br>• Create audit log query endpoints (admin) | • All auth events logged<br>• Audit logs queryable<br>• Logs immutable | 3-4 |
+| **Day 11** | • Implement token refresh endpoint (POST /auth/refresh)<br>• Add refresh token validation logic<br>• Implement logout (revoke refresh token)<br>• Add session management (Redis) | • Refresh tokens work<br>• Logout revokes tokens<br>• Sessions tracked in Redis | 3-4 |
+| **Day 12** | • Create Dockerfile (multi-stage build)<br>• Optimize image size (Alpine, distroless)<br>• Test Docker build locally<br>• Push to GitHub Container Registry | • Docker image builds<br>• Image < 200MB<br>• Image runs correctly | 3-4 |
+| **Day 13** | • Create Railway account<br>• Deploy Auth Service to Railway<br>• Configure environment variables<br>• Connect to Neon PostgreSQL<br>• Connect to Upstash Redis<br>• Test deployed service | • Service live on Railway<br>• Database connected<br>• Redis connected<br>• HTTPS working | 4-5 |
+| **Day 14** | • Write comprehensive README<br>• Create architecture diagram<br>• Document all API endpoints<br>• Create Postman collection (import ready)<br>• Code cleanup and refactoring | • Documentation complete<br>• Diagram published<br>• Postman collection tested<br>• Code clean | 3-4 |
+
+**Week 2 Deliverables:**
+- ✅ MFA (TOTP) working
+- ✅ Audit logging complete
+- ✅ Token refresh implemented
+- ✅ Deployed to Railway (live URL)
+- ✅ Documentation complete
+
+---
+
+#### **WEEK 3: Banking Service Foundation (Days 15-21)**
+
+**Objectives:**
+- Setup banking service project
+- Implement account management
+- Implement deposit/withdrawal
+- Database schema with double-entry ledger
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 15** | • Initialize Spring Boot project (banking-service)<br>• Setup multi-module structure<br>• Configure PostgreSQL (banking schema)<br>• Configure Redis connection<br>• Test service starts correctly | • Project compiles<br>• Database connected<br>• Redis connected | 3-4 |
+| **Day 16** | • Create Flyway migrations (accounts, transactions, ledger)<br>• Define JPA entities (Account, Transaction, LedgerEntry)<br>• Create repositories with custom queries<br>• Add optimistic locking (@Version) | • Banking schema created<br>• Entities mapped<br>• Repositories tested | 4-5 |
+| **Day 17** | • Implement AccountService (create, list, get)<br>• Generate account numbers (unique)<br>• Create AccountController (REST endpoints)<br>• Add input validation<br>• Test account creation | • Account creation working<br>• Account listing working<br>• Account numbers unique | 4-5 |
+| **Day 18** | • Implement deposit logic (TransactionService)<br>• Create ledger entries for deposits<br>• Update account balance atomically<br>• Add transaction logging<br>• Test deposit flow | • Deposit endpoint working<br>• Balance updates correctly<br>• Ledger entries created | 4-5 |
+| **Day 19** | • Implement withdrawal logic<br>• Add balance validation (prevent overdraft)<br>• Create ledger entries for withdrawals<br>• Test withdrawal flow<br>• Test insufficient funds scenario | • Withdrawal working<br>• Overdraft prevented<br>• Error handling correct | 4-5 |
+| **Day 20** | • Implement transaction history endpoint<br>• Add pagination (Spring Data)<br>• Add filtering (by date, type)<br>• Optimize queries (indexes)<br>• Test with large datasets | • Transaction history working<br>• Pagination correct<br>• Performance acceptable | 3-4 |
+| **Day 21** | • Write unit tests (AccountService, TransactionService)<br>• Write repository tests (custom queries)<br>• Setup test data builders<br>• Check test coverage (target 80%+) | • 80%+ coverage<br>• All tests passing<br>• Test data reusable | 3-4 |
+
+**Week 3 Deliverables:**
+- ✅ Banking service running locally
+- ✅ Account management complete
+- ✅ Deposit/withdrawal working
+- ✅ Double-entry ledger implemented
+- ✅ 80%+ test coverage
+
+---
+
+#### **WEEK 4: Banking Service Advanced (Days 22-28)**
+
+**Objectives:**
+- Implement transfer with concurrency control
+- Add idempotency
+- Integrate with Auth service
+- Deploy to Railway
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 22** | • Implement transfer logic (2 accounts)<br>• Add pessimistic locking (SELECT FOR UPDATE)<br>• Create double-entry ledger for transfers<br>• Add transaction isolation (SERIALIZABLE) | • Basic transfer working<br>• Pessimistic locking applied<br>• Ledger entries balanced | 5-6 |
+| **Day 23** | • Write concurrency tests (100 parallel transfers)<br>• Test race condition scenarios<br>• Verify no overdrafts occur<br>• Verify no deadlocks<br>• Optimize lock ordering | • Concurrency safe<br>• All tests pass<br>• No race conditions<br>• No deadlocks | 5-6 |
+| **Day 24** | • Implement idempotency with Redis<br>• Add Idempotency-Key header validation<br>• Store idempotency results (24h TTL)<br>• Test duplicate request handling | • Idempotency working<br>• Duplicate requests return same result<br>• TTL enforced | 4-5 |
+| **Day 25** | • Add Auth service integration<br>• Create AuthClient (REST client)<br>• Implement JWT validation<br>• Add user context extraction<br>• Secure all endpoints | • JWT validation working<br>• User context available<br>• Authorization enforced | 4-5 |
+| **Day 26** | • Add Resilience4j circuit breaker<br>• Configure retry logic (exponential backoff)<br>• Add timeout configuration<br>• Test failure scenarios | • Circuit breaker working<br>• Retries configured<br>• Timeouts enforced | 3-4 |
+| **Day 27** | • Create Dockerfile (banking service)<br>• Deploy to Railway<br>• Configure environment variables<br>• Connect to Neon database<br>• Test deployed service end-to-end | • Service live on Railway<br>• Database connected<br>• Integration with Auth working | 4-5 |
+| **Day 28** | • Write integration tests (full transfer flow)<br>• Test Auth + Banking integration<br>• Update documentation<br>• Create Postman collection<br>• Code cleanup | • Integration tests passing<br>• Documentation updated<br>• Postman collection ready | 3-4 |
+
+**Week 4 Deliverables:**
+- ✅ Transfer with concurrency control working
+- ✅ Idempotency implemented
+- ✅ Auth integration complete
+- ✅ Deployed to Railway
+- ✅ End-to-end tests passing
+
+---
+
+#### **WEEK 5: Integration, Testing & Polish (Days 29-35)**
+
+**Objectives:**
+- Complete end-to-end testing
+- Create demo script
+- Write comprehensive documentation
+- Add observability
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 29** | • Create docker-compose.yml (full stack)<br>• Add seed data script (demo users, accounts)<br>• Test full stack startup<br>• Fix any integration issues | • Full stack runs locally<br>• Seed data loads correctly<br>• All services communicate | 3-4 |
+| **Day 30** | • Write end-to-end test script (bash)<br>• Test flow: Register → Login → Create account → Deposit → Transfer<br>• Create Postman automated tests<br>• Document expected outcomes | • E2E script works<br>• All steps succeed<br>• Postman tests pass | 3-4 |
+| **Day 31** | • Add custom business metrics<br>• Configure Prometheus endpoints<br>• Create metrics dashboard (JSON)<br>• Test metrics collection | • Metrics exposed<br>• Dashboard configured<br>• Metrics accurate | 3-4 |
+| **Day 32** | • Setup Vite + React 18 frontend project<br>• Configure Tailwind CSS + React Query<br>• Implement login page with JWT storage<br>• Implement dashboard (account list + balances)<br>• Connect to Auth Service API | • Frontend project initialized<br>• Login flow working<br>• Dashboard displays accounts | 4-5 |
+| **Day 33** | • Implement transfer form with idempotency key<br>• Implement transaction history with pagination<br>• Add React Router for navigation<br>• Deploy frontend to Vercel<br>• Test full E2E flow via UI | • Transfer form working<br>• Transaction history displays<br>• Frontend live on Vercel<br>• UI demo ready | 4-5 |
+| **Day 34** | • Run security scans (Trivy, OWASP Dependency Check)<br>• Fix critical/high vulnerabilities<br>• Update dependencies<br>• Re-test after updates | • Security scans pass<br>• No critical vulnerabilities<br>• Dependencies updated | 3-4 |
+| **Day 35** | • Final code review<br>• Fix TODO comments<br>• Remove debug logging<br>• Ensure consistent code style<br>• Final commit and tag (v1.0.0) | • Code clean<br>• No TODOs<br>• Style consistent<br>• v1.0.0 released | 2-3 |
+
+**Week 5 Deliverables:**
+- ✅ Full stack demo working (docker-compose)
+- ✅ E2E test script automated
+- ✅ Documentation complete
+- ✅ **React Frontend deployed to Vercel**
+- ✅ Security scans passing
+- ✅ v1.0.0 released
+
+---
+
+#### **WEEK 6: Deployment & Job Launch (Days 36-42)**
+
+**Objectives:**
+- Finalize deployment
+- Prepare interview materials
+- Launch job applications
+- Practice interview presentation
+
+**Daily Tasks:**
+
+| Day | Tasks | Deliverables | Hours |
+|-----|-------|--------------|-------|
+| **Day 36** | • Verify both services live and healthy<br>• Test live demo end-to-end<br>• Fix any production issues<br>• Setup monitoring alerts | • Live demo working<br>• No errors<br>• Monitoring active | 2-3 |
+| **Day 37** | • Update resume with project<br>• Add project to LinkedIn<br>• Create LinkedIn post about project<br>• Prepare project summary (elevator pitch) | • Resume updated<br>• LinkedIn updated<br>• Post published<br>• Pitch ready | 2-3 |
+| **Day 38** | • Create 5-minute demo video<br>• Record screen + voiceover<br>• Upload to YouTube (unlisted)<br>• Add demo link to resume/LinkedIn | • Demo video complete<br>• YouTube link ready<br>• Video < 5 min | 2-3 |
+| **Day 39** | • Prepare interview answers (15 common questions)<br>• Practice explaining architecture (whiteboard)<br>• Practice live demo (timed 5min)<br>• Prepare "challenges solved" stories | • Answers documented<br>• Architecture explanation practiced<br>• Demo rehearsed | 2-3 |
+| **Day 40** | • Research 30 target companies<br>• Prepare customized cover letters<br>• Apply to 10 companies (fintech/banking) | • 10 applications submitted<br>• Cover letters customized | 2-3 |
+| **Day 41** | • Apply to 10 more companies<br>• Follow up on networking contacts<br>• Send project links to recruiters | • 20 total applications<br>• Recruiter outreach done | 2-3 |
+| **Day 42** | • Apply to final 10 companies<br>• Setup interview calendar<br>• Prepare for phone screens<br>• Continue monitoring/improving system | • 30 total applications<br>• Calendar ready<br>• System maintained | 2-3 |
+
+**Week 6 Deliverables:**
+- ✅ Production deployment stable
+- ✅ Resume & LinkedIn updated
+- ✅ Demo video published
+- ✅ Interview prep complete
+- ✅ 30 job applications submitted
+- ✅ Ready for interviews
+
+---
+
+### 6.3 Milestone Checkpoints
+
+| Milestone | Week | Success Criteria |
+|-----------|------|-----------------|
+| **M1: Auth Service MVP** | End Week 1 | Registration, login, JWT working; deployed locally |
+| **M2: Auth Service Complete** | End Week 2 | MFA, audit logs, refresh tokens; deployed to Railway |
+| **M3: Banking Service MVP** | End Week 3 | Account mgmt, deposit/withdrawal working |
+| **M4: Banking Service Complete** | End Week 4 | Transfer, idempotency, concurrency safe; deployed to Railway |
+| **M5: Integration Complete** | End Week 5 | Full E2E flow working, tested, documented |
+| **M6: Job Search Launch** | End Week 6 | Live demo, applications submitted, interviews scheduled |
+
+### 6.4 Risk Management
+
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| **Technical debt accumulation** | High | Medium | Allocate Day 35 for refactoring; code reviews |
+| **Free tier limitations** | Medium | Low | Monitor usage; have paid tier backup plan |
+| **Integration bugs** | High | Medium | Early integration testing (Week 4); buffer time Week 5 |
+| **Scope creep** | High | High | Strict adherence to plan; defer features to Phase 2 |
+| **Time overrun** | Medium | Medium | Weekly progress reviews; cut optional features if needed |
+| **Interview scheduling conflicts** | Low | Medium | Flexible Week 6; can extend job search beyond 6 weeks |
+
+---
+
+## 7. RISK ASSESSMENT & MITIGATION
+
+### 7.1 Technical Risks
+
+| Risk ID | Risk Description | Impact | Probability | Mitigation Strategy | Owner |
+|---------|-----------------|--------|-------------|---------------------|-------|
+| **TR-001** | **Free tier database capacity exceeded (Neon 500MB limit)** | High | Medium | • Monitor database size weekly<br>• Implement data retention policy (delete test data)<br>• Archive old audit logs to S3<br>• Backup plan: Upgrade to paid tier ($19/month) | Tech Lead |
+| **TR-002** | **Redis command limit exceeded (Upstash 10K/day)** | Medium | Low | • Monitor Redis usage daily<br>• Optimize cache TTLs<br>• Use database as fallback for non-critical caching<br>• Backup: Upgrade to paid tier ($10/month) | Tech Lead |
+| **TR-003** | **Concurrency bugs in transfer logic** | Critical | Medium | • Extensive testing with Testcontainers<br>• Load test with 100 parallel transfers<br>• Code review of critical transaction logic<br>• Use proven patterns (pessimistic locking) | Tech Lead |
+| **TR-004** | **JWT token security vulnerability** | Critical | Low | • Use RS256 (not HS256)<br>• Short token expiry (15 min)<br>• Security scan with OWASP ZAP<br>• Follow Spring Security best practices | Tech Lead |
+| **TR-005** | **Data loss due to deployment error** | High | Low | • Database migrations tested locally first<br>• Never use `ddl-auto=create` in production<br>• Neon automatic backups (7-day retention)<br>• Export critical data before major changes | Tech Lead |
+| **TR-006** | **Performance degradation under load** | Medium | Medium | • Load test with Gatling (target 50 concurrent users)<br>• Database query optimization (indexes, EXPLAIN)<br>• Connection pool tuning (HikariCP)<br>• Add caching where appropriate | Tech Lead |
+| **TR-007** | **Integration issues between services** | High | Medium | • Contract testing with Spring Cloud Contract<br>• Integration tests in Week 4<br>• Docker Compose for local full-stack testing<br>• Clear API versioning (/api/v1) | Tech Lead |
+| **TR-008** | **Dependency vulnerabilities** | Medium | Medium | • Weekly security scans with Trivy<br>• Keep dependencies updated<br>• Use Dependabot for automated PRs<br>• Review CVEs for critical libraries | Tech Lead |
+
+### 7.2 Project Management Risks
+
+| Risk ID | Risk Description | Impact | Probability | Mitigation Strategy | Owner |
+|---------|-----------------|--------|-------------|---------------------|-------|
+| **PM-001** | **Scope creep (adding unnecessary features)** | High | High | • Strict adherence to 6-week plan<br>• "Future Enhancements" section in README for deferred features<br>• Weekly scope reviews<br>• Remember: goal is job offer, not perfect system | Project Manager |
+| **PM-002** | **Timeline slippage due to learning curve** | Medium | Medium | • Buffer time in Week 5 (only 15 hours planned)<br>• Can skip optional features (MFA backup codes, admin endpoints)<br>• Parallel track documentation while coding<br>• Ask for help early (Stack Overflow, Discord) | Project Manager |
+| **PM-003** | **Burnout or motivation loss** | High | Medium | • Celebrate weekly milestones<br>• Work in 2-hour blocks with breaks<br>• Join developer community for accountability<br>• Remember end goal (job offer worth $80K+) | Project Manager |
+| **PM-004** | **Over-engineering (gold-plating)** | Medium | High | • Focus on "good enough for interview demo"<br>• Production patterns yes, production scale no<br>• Document what would change at scale<br>• Review plan daily: am I on track? | Project Manager |
+| **PM-005** | **Job applications start before system is ready** | High | Low | • Firm rule: no applications until Week 6<br>• Use Week 5 buffer to finish<br>• Live demo must work before first application<br>• Can extend Week 6 if needed | Project Manager |
+
+### 7.3 External Risks
+
+| Risk ID | Risk Description | Impact | Probability | Mitigation Strategy | Owner |
+|---------|-----------------|--------|-------------|---------------------|-------|
+| **EX-001** | **Railway/Neon/Upstash service outage** | High | Low | • Have docker-compose for local demo<br>• Can demo locally in interview if needed<br>• Monitor status pages<br>• Consider multi-cloud (backup on Render) | Tech Lead |
+| **EX-002** | **GitHub Actions quota exceeded** | Low | Low | • Monitor CI/CD minutes usage<br>• Optimize pipeline (cache dependencies)<br>• Alternative: GitLab CI/CD (also free) | Tech Lead |
+| **EX-003** | **Breaking changes in dependencies** | Medium | Low | • Pin exact versions in pom.xml<br>• Test before updating dependencies<br>• Review changelogs before upgrading | Tech Lead |
+| **EX-004** | **Job market conditions change** | Medium | Low | • Apply broadly (30+ companies)<br>• Target multiple sectors (fintech, SaaS, enterprise)<br>• Diversify skills highlighted in resume<br>• This project still valuable for learning | Project Manager |
+
+### 7.4 Interview/Career Risks
+
+| Risk ID | Risk Description | Impact | Probability | Mitigation Strategy | Owner |
+|---------|-----------------|--------|-------------|---------------------|-------|
+| **CR-001** | **Interviewer asks about features not implemented** | Medium | High | • Prepare "Future Enhancements" list<br>• Practice explaining tradeoffs<br>• "I prioritized X over Y because..."<br>• Turn question into discussion of design choices | Candidate |
+| **CR-002** | **Technical question outside project scope** | Medium | Medium | • Practice LeetCode/algorithms separately<br>• Project demonstrates architecture, not algorithms<br>• Study system design separately<br>• Be honest about gaps in knowledge | Candidate |
+| **CR-003** | **Interviewer dismisses project as "toy"** | High | Medium | • Emphasize production patterns used<br>• Discuss what changes at scale<br>• Highlight specific challenges solved<br>• Explain infrastructure tradeoffs clearly | Candidate |
+| **CR-004** | **Demo fails during interview** | Critical | Low | • Practice demo 10+ times<br>• Have backup recorded video<br>• Test demo day before interview<br>• Have screenshots as fallback | Candidate |
+| **CR-005** | **Can't explain architectural decisions** | High | Medium | • Write decision log during development<br>• Practice explaining to non-technical friend<br>• Prepare answers to "Why X not Y?" questions<br>• Study alternatives to choices made | Candidate |
+
+### 7.5 Contingency Plans
+
+#### Contingency 1: Timeline Extension Required
+
+**Trigger:** End of Week 4, less than 70% complete
+
+**Actions:**
+1. Extend timeline to 8 weeks
+2. Cut optional features:
+   - MFA backup codes
+   - Admin audit log queries
+   - Advanced rate limiting
+3. Focus on core: Registration, Login, JWT, Transfer, Idempotency
+4. Defer deployment polish to Week 8
+
+#### Contingency 2: Free Tier Limits Exceeded
+
+**Trigger:** Database > 450MB or Redis > 9K commands/day
+
+**Actions:**
+1. **Database:** Delete test data, archive audit logs to JSON files
+2. **Redis:** Reduce session TTL from 15min to 5min, increase idempotency TTL to 48h
+3. **Emergency:** Pay for upgraded tier (budget $20-30/month)
+4. **Long-term:** Optimize data models, add data retention policy
+
+#### Contingency 3: Critical Bug Found in Week 6
+
+**Trigger:** Production system not working in Week 6
+
+**Actions:**
+1. Roll back to last known good version (v1.0.0 tag)
+2. Delay job applications by 3-5 days
+3. Fix bug in isolated branch
+4. Re-deploy after testing
+5. Better to delay than demo broken system
+
+#### Contingency 4: No Interview Responses After 30 Applications
+
+**Trigger:** 2 weeks after Week 6, zero interview invites
+
+**Actions:**
+1. Audit resume and LinkedIn (get feedback)
+2. Network more actively (DMs, events, referrals)
+3. Add frontend (simple React UI) to project
+4. Write blog post about technical challenges
+5. Apply to additional 30 companies
+6. Consider contract/freelance roles for experience
+
+---
+
+## 8. QUALITY ASSURANCE STRATEGY
+
+### 8.1 Testing Pyramid
+
+```
+                    ┌─────────────┐
+                    │   E2E (5%)  │  ← 5-10 tests
+                    ├─────────────┤
+                 ┌──┴─────────────┴──┐
+                 │ Integration (15%) │  ← 20-30 tests
+                 ├───────────────────┤
+            ┌────┴───────────────────┴────┐
+            │    Unit Tests (80%)         │  ← 100-150 tests
+            └─────────────────────────────┘
+```
+
+### 8.2 Testing Strategy by Layer
+
+#### 8.2.1 Unit Testing
+
+**Target Coverage:** 80%+ line coverage, 70%+ branch coverage
+
+**Scope:**
+- Service layer business logic
+- Utility classes
+- Validators
+- Mappers/DTOs
+
+**Tools:**
+- JUnit 5
+- Mockito (mock dependencies)
+- AssertJ (fluent assertions)
+
+**Example Tests:**
+
+```java
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+    
+    @Mock
+    private UserRepository userRepository;
+    
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    
+    @InjectMocks
+    private UserService userService;
+    
+    @Test
+    @DisplayName("Should successfully register user with valid data")
+    void testRegisterUser_Success() {
+        // Given
+        RegisterRequest request = new RegisterRequest(
+            "alice@example.com", 
+            "SecureP@ssw0rd",
+            "Alice",
+            "Johnson"
+        );
+        
+        when(userRepository.existsByEmail(request.getEmail()))
+            .thenReturn(false);
+        when(passwordEncoder.encode(request.getPassword()))
+            .thenReturn("$2a$12$hashedPassword");
+        when(userRepository.save(any(User.class)))
+            .thenAnswer(i -> i.getArgument(0));
+        
+        // When
+        UserResponse response = userService.register(request);
+        
+        // Then
+        assertThat(response.getEmail()).isEqualTo("alice@example.com");
+        verify(userRepository).save(argThat(user -> 
+            user.getEmail().equals("alice@example.com") &&
+            user.getPasswordHash().equals("$2a$12$hashedPassword")
+        ));
+    }
+    
+    @Test
+    @DisplayName("Should throw exception when email already exists")
+    void testRegisterUser_DuplicateEmail() {
+        // Given
+        RegisterRequest request = new RegisterRequest(
+            "alice@example.com", 
+            "SecureP@ssw0rd",
+            "Alice",
+            "Johnson"
+        );
+        
+        when(userRepository.existsByEmail(request.getEmail()))
+            .thenReturn(true);
+        
+        // When & Then
+        assertThatThrownBy(() -> userService.register(request))
+            .isInstanceOf(UserAlreadyExistsException.class)
+            .hasMessage("User with email alice@example.com already exists");
+        
+        verify(userRepository, never()).save(any());
+    }
+}
+```
+
+#### 8.2.2 Integration Testing
+
+**Target:** 20-30 integration tests covering critical paths
+
+**Scope:**
+- Controller → Service → Repository (full stack)
+- Database interactions
+- Redis operations
+- JWT validation
+
+**Tools:**
+- Spring Boot Test (@SpringBootTest)
+- Testcontainers (real PostgreSQL, Redis)
+- REST Assured (API testing)
+
+**Example Test:**
+
+```java
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Testcontainers
+class AuthIntegrationTest {
+    
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
+        .withDatabaseName("test_auth_db")
+        .withUsername("test")
+        .withPassword("test");
+    
+    @Container
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7.2-alpine")
+        .withExposedPorts(6379);
+    
+    @LocalServerPort
+    private int port;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @BeforeEach
+    void setup() {
+        RestAssured.port = port;
+        userRepository.deleteAll();
+    }
+    
+    @Test
+    @DisplayName("Complete auth flow: Register → Login → Access protected endpoint")
+    void testCompleteAuthFlow() {
+        // Step 1: Register
+        RegisterRequest registerRequest = new RegisterRequest(
+            "alice@test.com",
+            "SecureP@ssw0rd",
+            "Alice",
+            "Johnson"
+        );
+        
+        given()
+            .contentType(ContentType.JSON)
+            .body(registerRequest)
+        .when()
+            .post("/api/v1/auth/register")
+        .then()
+            .statusCode(201)
+            .body("email", equalTo("alice@test.com"));
+        
+        // Step 2: Login
+        LoginRequest loginRequest = new LoginRequest(
+            "alice@test.com",
+            "SecureP@ssw0rd"
+        );
+        
+        String accessToken = given()
+            .contentType(ContentType.JSON)
+            .body(loginRequest)
+        .when()
+            .post("/api/v1/auth/login")
+        .then()
+            .statusCode(200)
+            .body("tokenType", equalTo("Bearer"))
+            .extract()
+            .path("accessToken");
+        
+        // Step 3: Access protected endpoint with JWT
+        given()
+            .header("Authorization", "Bearer " + accessToken)
+        .when()
+            .get("/api/v1/users/me")
+        .then()
+            .statusCode(200)
+            .body("email", equalTo("alice@test.com"));
+    }
+}
+```
+
+#### 8.2.3 End-to-End Testing
+
+**Target:** 5-10 E2E tests covering complete user journeys
+
+**Scope:**
+- Full user workflows across services
+- Auth Service → Banking Service integration
+- Real HTTP requests, real databases
+
+**Tools:**
+- REST Assured
+- Testcontainers (full stack)
+- Bash scripts (for demo)
+
+**Example E2E Test:**
+
+```java
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@Testcontainers
+class BankingE2ETest {
+    
+    // Start both Auth and Banking services
+    // Use Testcontainers for databases
+    
+    @Test
+    @DisplayName("E2E: User creates account, deposits, and transfers money")
+    void testCompleteCustomerJourney() {
+        // 1. Register user
+        String userId = registerUser("alice@test.com", "SecureP@ssw0rd");
+        
+        // 2. Login and get JWT
+        String accessToken = login("alice@test.com", "SecureP@ssw0rd");
+        
+        // 3. Create savings account
+        String accountId = given()
+            .header("Authorization", "Bearer " + accessToken)
+            .body(new CreateAccountRequest("SAVINGS", "USD"))
+        .when()
+            .post("http://localhost:8081/api/v1/accounts")
+        .then()
+            .statusCode(201)
+            .extract()
+            .path("accountId");
+        
+        // 4. Deposit $1000
+        given()
+            .header("Authorization", "Bearer " + accessToken)
+            .header("Idempotency-Key", "txn:" + userId + ":deposit1")
+            .body(new DepositRequest(1000.00, "USD"))
+        .when()
+            .post("http://localhost:8081/api/v1/accounts/" + accountId + "/deposit")
+        .then()
+            .statusCode(200);
+        
+        // 5. Verify balance
+        BigDecimal balance = given()
+            .header("Authorization", "Bearer " + accessToken)
+        .when()
+            .get("http://localhost:8081/api/v1/accounts/" + accountId + "/balance")
+        .then()
+            .statusCode(200)
+            .extract()
+            .path("balance");
+        
+        assertThat(balance).isEqualByComparingTo(new BigDecimal("1000.00"));
+        
+        // 6. Create second account
+        String toAccountId = given()
+            .header("Authorization", "Bearer " + accessToken)
+            .body(new CreateAccountRequest("CHECKING", "USD"))
+        .when()
+            .post("http://localhost:8081/api/v1/accounts")
+        .then()
+            .statusCode(201)
+            .extract()
+            .path("accountId");
+        
+        // 7. Transfer $500
+        given()
+            .header("Authorization", "Bearer " + accessToken)
+            .header("Idempotency-Key", "txn:" + userId + ":transfer1")
+            .body(new TransferRequest(accountId, toAccountId, 500.00, "USD"))
+        .when()
+            .post("http://localhost:8081/api/v1/transfers")
+        .then()
+            .statusCode(200)
+            .body("status", equalTo("COMPLETED"));
+        
+        // 8. Verify balances
+        BigDecimal fromBalance = getBalance(accessToken, accountId);
+        BigDecimal toBalance = getBalance(accessToken, toAccountId);
+        
+        assertThat(fromBalance).isEqualByComparingTo(new BigDecimal("500.00"));
+        assertThat(toBalance).isEqualByComparingTo(new BigDecimal("500.00"));
+    }
+}
+```
+
+#### 8.2.4 Concurrency Testing
+
+**Purpose:** Verify transfer logic handles race conditions
+
+```java
+@Test
+@DisplayName("Concurrent transfers should not cause overdraft")
+void testConcurrentTransfers() throws Exception {
+    // Setup: Account with $1000
+    String accountId = createAccountWithBalance(1000.00);
+    String targetAccount1 = createAccount();
+    String targetAccount2 = createAccount();
+    
+    // Execute: 2 concurrent transfers of $600 each
+    ExecutorService executor = Executors.newFixedThreadPool(2);
+    
+    Future<Response> future1 = executor.submit(() -> 
+        transfer(accountId, targetAccount1, 600.00)
+    );
+    
+    Future<Response> future2 = executor.submit(() ->
+        transfer(accountId, targetAccount2, 600.00)
+    );
+    
+    Response response1 = future1.get();
+    Response response2 = future2.get();
+    
+    // Assert: One succeeds, one fails
+    List<Integer> statusCodes = List.of(
+        response1.getStatusCode(),
+        response2.getStatusCode()
+    );
+    
+    assertThat(statusCodes).containsExactlyInAnyOrder(200, 400);
+    
+    // Verify: Balance is $400 (one transfer succeeded)
+    BigDecimal finalBalance = getBalance(accountId);
+    assertThat(finalBalance).isEqualByComparingTo(new BigDecimal("400.00"));
+    
+    // Verify: Ledger is balanced
+    assertLedgerBalanced();
+}
+```
+
+### 8.3 Test Coverage Targets
+
+| Component | Line Coverage | Branch Coverage | Priority |
+|-----------|---------------|-----------------|----------|
+| Service Layer | 90%+ | 80%+ | Critical |
+| Controller Layer | 80%+ | 70%+ | High |
+| Repository Layer | 70%+ | N/A | Medium |
+| Domain Entities | 60%+ | 50%+ | Low |
+| Configuration Classes | 50%+ | N/A | Low |
+| **Overall Target** | **80%+** | **70%+** | **Critical** |
+
+### 8.4 Code Quality Metrics
+
+#### 8.4.1 SonarQube Quality Gates
+
+| Metric | Threshold | Action if Failed |
+|--------|-----------|------------------|
+| Code Coverage | ≥ 80% | Block merge until fixed |
+| Duplicated Lines | < 3% | Review and refactor |
+| Maintainability Rating | A or B | Accept, document technical debt |
+| Reliability Rating | A | Block merge until fixed |
+| Security Rating | A | Block merge until fixed |
+| Technical Debt Ratio | < 5% | Review and prioritize fixes |
+| Code Smells | < 50 | Review and prioritize fixes |
+| Bugs | 0 | Block merge until fixed |
+| Vulnerabilities | 0 | Block merge until fixed |
+
+#### 8.4.2 Code Style
+
+**Tool:** Checkstyle + Google Java Format
+
+**Rules:**
+- Indentation: 4 spaces (no tabs)
+- Line length: 120 characters max
+- Naming: camelCase for variables, PascalCase for classes
+- JavaDoc: Required for public methods
+- Imports: Organized, no wildcards
+
+### 8.5 Performance Testing
+
+#### 8.5.1 Load Testing with Gatling
+
+**Scenario:** Transfer stress test
+
+```scala
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+class TransferLoadTest extends Simulation {
+  
+  val httpProtocol = http
+    .baseUrl("https://banking-service.railway.app")
+    .header("Authorization", "Bearer ${jwtToken}")
+    .header("Content-Type", "application/json")
+  
+  val scn = scenario("Transfer Load Test")
+    .exec(
+      http("Create Transfer")
+        .post("/api/v1/transfers")
+        .body(StringBody("""{
+          "fromAccountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+          "toAccountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+          "amount": 10.00,
+          "currency": "USD"
+        }"""))
+        .check(status.is(200))
+    )
+  
+  setUp(
+    scn.inject(
+      rampUsers(50).during(30) // 50 users over 30 seconds
+    )
+  ).protocols(httpProtocol)
+}
+```
+
+**Acceptance Criteria:**
+- p95 response time < 500ms
+- p99 response time < 1000ms
+- Error rate < 1%
+- Throughput > 10 TPS
+
+### 8.6 Security Testing
+
+#### 8.6.1 Static Analysis (SAST)
+
+**Tool:** SonarQube Community Edition
+
+**Scans:**
+- SQL injection vulnerabilities
+- XSS vulnerabilities
+- Hardcoded credentials
+- Weak cryptography
+- Insecure deserialization
+
+#### 8.6.2 Dependency Scanning
+
+**Tool:** OWASP Dependency-Check + Trivy
+
+**Action:** Run weekly, block build on HIGH/CRITICAL
+
+```bash
+# Trivy scan
+trivy image auth-service:latest --severity HIGH,CRITICAL --exit-code 1
+
+# OWASP Dependency Check
+mvn org.owasp:dependency-check-maven:check
+```
+
+#### 8.6.3 Dynamic Analysis (DAST)
+
+**Tool:** OWASP ZAP (Zed Attack Proxy)
+
+**Tests:**
+- Automated baseline scan
+- Active scan on auth endpoints
+- JWT token testing
+- SQL injection attempts
+
+**Schedule:** Before each deployment
+
+### 8.7 Acceptance Testing
+
+#### 8.7.1 User Acceptance Criteria
+
+**Feature: User Registration**
+```gherkin
+Feature: User Registration
+  As a new user
+  I want to register for an account
+  So that I can use the banking system
+
+  Scenario: Successful registration
+    Given I am a new user
+    When I submit valid registration details
+    Then my account should be created
+    And I should receive a confirmation
+    And my password should be hashed in the database
+
+  Scenario: Duplicate email
+    Given a user with email "alice@test.com" already exists
+    When I try to register with email "alice@test.com"
+    Then I should receive an error "Email already in use"
+    And my account should not be created
+```
+
+### 8.8 Monitoring & Observability Testing
+
+**Tests:**
+- Health endpoints respond correctly (/actuator/health)
+- Metrics are exported (/actuator/prometheus)
+- Logs are structured JSON
+- Errors include correlation IDs
+
+**Verification:**
+```bash
+# Health check
+curl http://localhost:8080/actuator/health
+# Expected: {"status":"UP"}
+
+# Metrics check
+curl http://localhost:8080/actuator/prometheus | grep "transactions_total"
+# Expected: transactions_total{type="transfer"} 42
+```
+
+---
+
+## 9. DEPLOYMENT STRATEGY
+
+### 9.1 Deployment Architecture
+
+#### 9.1.1 Local Development Environment
+
+```
+┌────────────────────────────────────────┐
+│      Docker Compose Stack              │
+├────────────────────────────────────────┤
+│  • auth-service        (port 8080)     │
+│  • banking-service     (port 8081)     │
+│  • postgresql          (port 5432)     │
+│  • redis               (port 6379)     │
+│  • (optional) pgadmin  (port 5050)     │
+└────────────────────────────────────────┘
+```
+
+**docker-compose.yml:**
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: banking-postgres
+    environment:
+      POSTGRES_DB: banking_db
+      POSTGRES_USER: banking_user
+      POSTGRES_PASSWORD: secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - banking-network
+  
+  redis:
+    image: redis:7.2-alpine
+    container_name: banking-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - banking-network
+  
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/banking_db
+      SPRING_DATASOURCE_USERNAME: banking_user
+      SPRING_DATASOURCE_PASSWORD: secure_password
+      SPRING_REDIS_HOST: redis
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - banking-network
+  
+  banking-service:
+    build:
+      context: ./banking-service
+      dockerfile: Dockerfile
+    container_name: banking-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/banking_db
+      SPRING_DATASOURCE_USERNAME: banking_user
+      SPRING_DATASOURCE_PASSWORD: secure_password
+      SPRING_REDIS_HOST: redis
+      AUTH_SERVICE_URL: http://auth-service:8080
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - redis
+      - auth-service
+    networks:
+      - banking-network
+
+volumes:
+  postgres_data:
+
+networks:
+  banking-network:
+    driver: bridge
+```
+
+**Quick Start:**
+```bash
+# Clone repository
+git clone https://github.com/yourusername/distributed-banking-system
+cd distributed-banking-system
+
+# Start all services
+docker-compose up -d
+
+# Check service health
+curl http://localhost:8080/actuator/health
+curl http://localhost:8081/actuator/health
+
+# Run seed data
+./scripts/seed-data.sh
+
+# Run demo script
+./scripts/demo.sh
+```
+
+#### 9.1.2 Production Environment (Railway)
+
+```
+┌─────────────────────────────────────────────────┐
+│              Railway Platform                   │
+├─────────────────────────────────────────────────┤
+│  ┌──────────────────┐    ┌─────────────────┐   │
+│  │  auth-service    │    │ banking-service │   │
+│  │  (512MB RAM)     │    │  (512MB RAM)    │   │
+│  │  Auto SSL/TLS    │    │  Auto SSL/TLS   │   │
+│  └──────────────────┘    └─────────────────┘   │
+│           │                       │             │
+│           └───────────┬───────────┘             │
+│                       │                         │
+└───────────────────────┼─────────────────────────┘
+                        │
+        ┌───────────────┴────────────────┐
+        │                                │
+   ┌────▼──────┐                  ┌─────▼──────┐
+   │   Neon    │                  │  Upstash   │
+   │PostgreSQL │                  │   Redis    │
+   │ (500MB)   │                  │ (10K/day)  │
+   └───────────┘                  └────────────┘
+```
+
+**Deployment Configuration:**
+
+**railway.json (Auth Service):**
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/actuator/health",
+    "healthcheckTimeout": 100
+  }
+}
+```
+
+**Environment Variables (Railway):**
+```
+# Auth Service
+SPRING_PROFILES_ACTIVE=production
+SPRING_DATASOURCE_URL=jdbc:postgresql://<neon-host>:5432/auth_db
+SPRING_DATASOURCE_USERNAME=<neon-username>
+SPRING_DATASOURCE_PASSWORD=<neon-password>
+SPRING_REDIS_HOST=<upstash-host>
+SPRING_REDIS_PORT=6379
+SPRING_REDIS_PASSWORD=<upstash-password>
+SPRING_REDIS_SSL=true
+JWT_PRIVATE_KEY=<base64-encoded-private-key>
+JWT_PUBLIC_KEY=<base64-encoded-public-key>
+
+# Banking Service
+SPRING_PROFILES_ACTIVE=production
+SPRING_DATASOURCE_URL=jdbc:postgresql://<neon-host>:5432/banking_db
+SPRING_DATASOURCE_USERNAME=<neon-username>
+SPRING_DATASOURCE_PASSWORD=<neon-password>
+SPRING_REDIS_HOST=<upstash-host>
+SPRING_REDIS_PORT=6379
+SPRING_REDIS_PASSWORD=<upstash-password>
+SPRING_REDIS_SSL=true
+AUTH_SERVICE_URL=https://auth-service.railway.app
+```
+
+### 9.2 CI/CD Pipeline
+
+#### 9.2.1 GitHub Actions Workflow
+
+**.github/workflows/ci-cd.yml:**
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+      
+      - name: Run tests
+        run: mvn clean test
+      
+      - name: Generate coverage report
+        run: mvn jacoco:report
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./target/site/jacoco/jacoco.xml
+          fail_ci_if_error: true
+  
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+      
+      - name: OWASP Dependency Check
+        run: |
+          mvn org.owasp:dependency-check-maven:check
+  
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/auth-service:latest
+            ghcr.io/${{ github.repository }}/auth-service:${{ github.sha }}
+  
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+      
+      - name: Deploy to Railway
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+```
+
+### 9.3 Database Migration Strategy
+
+#### 9.3.1 Flyway Migration Process
+
+**Migration Naming Convention:**
+```
+V{version}__{description}.sql
+
+Examples:
+V1__create_users_table.sql
+V2__create_roles_table.sql
+V3__add_mfa_to_users.sql
+V4__create_accounts_table.sql
+```
+
+**Migration Execution:**
+```yaml
+# application.yml
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    locations: classpath:db/migration
+    schemas: auth,banking
+```
+
+**Rollback Strategy:**
+- Flyway migrations are forward-only (no automatic rollback)
+- For critical errors: Create new migration to revert changes
+- Test migrations in staging before production
+- Keep backups before running migrations
+
+#### 9.3.2 Zero-Downtime Deployment
+
+**Strategy:** Blue-Green Deployment (Railway supports this)
+
+```
+1. Current version (Blue) running
+2. Deploy new version (Green) alongside Blue
+3. Railway health check verifies Green is healthy
+4. Railway switches traffic from Blue to Green
+5. Monitor Green for issues
+6. If issues: Instant rollback to Blue
+7. If stable: Decommission Blue after 24 hours
+```
+
+**Health Check Configuration:**
+```yaml
+# application.yml
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+```
+
+### 9.4 Monitoring & Alerting
+
+#### 9.4.1 Application Metrics
+
+**Metrics Exposed:**
+- JVM metrics (heap, threads, GC)
+- HTTP metrics (request count, latency, errors)
+- Database metrics (connection pool, query time)
+- Redis metrics (command count, latency)
+- Custom business metrics (transactions, balance changes)
+
+**Prometheus Endpoint:**
+```
+GET /actuator/prometheus
+
+# Sample output
+transactions_total{type="transfer",status="success"} 127
+transactions_total{type="transfer",status="failed"} 3
+http_server_requests_seconds_count{uri="/api/v1/transfers",method="POST",status="200"} 124
+http_server_requests_seconds_sum{uri="/api/v1/transfers",method="POST",status="200"} 15.3
+```
+
+#### 9.4.2 Log Aggregation
+
+**Structured Logging (JSON):**
+```json
+{
+  "timestamp": "2026-02-10T10:30:00.123Z",
+  "level": "INFO",
+  "logger": "com.banking.service.TransactionService",
+  "message": "Transfer completed successfully",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "transactionId": "9e1g8891-9647-62fg-b66d-g29he3h12cg9",
+  "amount": 100.50,
+  "duration_ms": 127
+}
+```
+
+**Log Levels:**
+- ERROR: Application errors, exceptions
+- WARN: Unusual situations, validation failures
+- INFO: Business events (transaction created, user registered)
+- DEBUG: Detailed debugging (disabled in production)
+
+### 9.5 Backup & Recovery
+
+#### 9.5.1 Database Backups
+
+**Neon Automatic Backups:**
+- Point-in-time recovery (PITR): 7 days retention
+- Automated daily snapshots
+- Manual snapshots before major changes
+
+**Backup Verification:**
+```bash
+# Monthly backup verification
+1. Restore latest backup to test database
+2. Run integrity checks (ledger balance verification)
+3. Run automated tests against restored data
+4. Document results
+```
+
+#### 9.5.2 Disaster Recovery Plan
+
+**RTO (Recovery Time Objective):** 1 hour  
+**RPO (Recovery Point Objective):** 24 hours
+
+**Recovery Procedure:**
+1. Identify incident (service down, data corruption)
+2. Assess impact (partial or full outage)
+3. Restore from latest backup (Neon PITR)
+4. Verify data integrity (run reconciliation)
+5. Redeploy services (Railway rollback or fresh deploy)
+6. Monitor for 2 hours post-recovery
+7. Post-mortem within 48 hours
+
+### 9.6 Deployment Checklist
+
+**Pre-Deployment:**
+- [ ] All tests passing (CI/CD green)
+- [ ] Security scans passed (Trivy, OWASP)
+- [ ] Code coverage ≥ 80%
+- [ ] Database migrations tested in staging
+- [ ] Environment variables configured
+- [ ] Health checks responding
+- [ ] Monitoring dashboards ready
+
+**Deployment:**
+- [ ] Deploy to staging first
+- [ ] Run smoke tests in staging
+- [ ] Backup production database
+- [ ] Deploy to production (Railway)
+- [ ] Verify health checks (both services)
+- [ ] Run smoke tests in production
+
+**Post-Deployment:**
+- [ ] Monitor error rates (< 1%)
+- [ ] Monitor response times (p95 < 500ms)
+- [ ] Check logs for errors
+- [ ] Verify metrics collection
+- [ ] Test critical paths manually
+- [ ] Document deployment (timestamp, version, changes)
+
+---
+
+## 10. SUCCESS CRITERIA & KPIs
+
+### 10.1 Technical Success Metrics
+
+#### 10.1.1 Code Quality Metrics
+
+| Metric | Target | Measurement Method | Status Gate |
+|--------|--------|-------------------|-------------|
+| **Test Coverage (Line)** | ≥ 80% | JaCoCo report | Block merge if < 80% |
+| **Test Coverage (Branch)** | ≥ 70% | JaCoCo report | Warning if < 70% |
+| **Code Duplication** | < 3% | SonarQube | Warning if ≥ 3% |
+| **Technical Debt Ratio** | < 5% | SonarQube | Warning if ≥ 5% |
+| **Bugs (SonarQube)** | 0 | SonarQube scan | Block merge if > 0 |
+| **Vulnerabilities** | 0 HIGH/CRITICAL | Trivy + OWASP | Block merge if any found |
+| **Code Smells** | < 50 | SonarQube | Warning if ≥ 50 |
+| **Cyclomatic Complexity** | < 15 per method | SonarQube | Warning if ≥ 15 |
+
+#### 10.1.2 Performance Metrics
+
+| Metric | Target | Measurement Method | Acceptance Criteria |
+|--------|--------|-------------------|---------------------|
+| **API Response Time (p95)** | < 500ms | Gatling load test | Must meet for production |
+| **API Response Time (p99)** | < 1000ms | Gatling load test | Nice to have |
+| **Throughput** | ≥ 10 TPS | Gatling load test | Must meet for production |
+| **Error Rate** | < 1% | Gatling load test | Must meet for production |
+| **Database Query Time (avg)** | < 100ms | Spring Actuator metrics | Optimization needed if > 100ms |
+| **Redis Operation Time** | < 10ms | Spring Actuator metrics | Expected performance |
+| **Concurrent Users** | ≥ 50 simultaneous | Gatling load test | Must handle without degradation |
+
+#### 10.1.3 Reliability Metrics
+
+| Metric | Target | Verification Method | Success Criteria |
+|--------|--------|---------------------|------------------|
+| **Data Consistency** | 100% | Ledger reconciliation function | Zero balance discrepancies |
+| **Idempotency** | 100% | Duplicate request tests | Same idempotency key = same result |
+| **Concurrent Safety** | 100% | 100 parallel transfer tests | Zero overdrafts, zero race conditions |
+| **Transaction Atomicity** | 100% | Failure injection tests | Rollback on any step failure |
+| **Uptime (Local)** | > 99% | Health check monitoring | Service restarts automatically |
+
+### 10.2 Project Completion Metrics
+
+#### 10.2.1 Feature Completion
+
+| Feature | Priority | Status | Completion Criteria |
+|---------|----------|--------|---------------------|
+| User Registration | P0 | Target: Week 1 | • Endpoint working<br>• Password hashed<br>• Tests passing |
+| User Login (JWT) | P0 | Target: Week 1 | • JWT generated<br>• Token validated<br>• Tests passing |
+| MFA (TOTP) | P1 | Target: Week 2 | • QR code generated<br>• TOTP verified<br>• Tests passing |
+| Account Creation | P0 | Target: Week 3 | • Unique account numbers<br>• Balance initialized<br>• Tests passing |
+| Deposit/Withdrawal | P0 | Target: Week 3 | • Balance updated<br>• Ledger created<br>• Tests passing |
+| Transfer (P2P) | P0 | Target: Week 4 | • Double-entry ledger<br>• Concurrency safe<br>• Tests passing |
+| Idempotency | P0 | Target: Week 4 | • Redis-backed<br>• 24h TTL<br>• Tests passing |
+| Auth Integration | P0 | Target: Week 4 | • JWT validation<br>• User context<br>• Tests passing |
+| Documentation | P0 | Target: Week 5 | • README complete<br>• Architecture diagram<br>• API docs |
+| Deployment | P0 | Target: Week 6 | • Live on Railway<br>• HTTPS working<br>• Demo script ready |
+
+**Overall Feature Completion Target:** 100% of P0 features by Week 6
+
+#### 10.2.2 Documentation Completion
+
+| Document | Target | Completion Criteria |
+|----------|--------|---------------------|
+| **README.md** | Week 5 | • Quick start guide<br>• Architecture overview<br>• Setup instructions |
+| **ARCHITECTURE.md** | Week 5 | • System diagram<br>• Component descriptions<br>• Data flow |
+| **API_DOCS.md** | Week 5 | • All endpoints documented<br>• Request/response examples<br>• Error codes |
+| **POSTMAN_COLLECTION** | Week 5 | • All endpoints included<br>• Environment variables<br>• Test assertions |
+| **DEMO_SCRIPT.md** | Week 5 | • Step-by-step guide<br>• Expected outputs<br>• Timing < 5min |
+
+### 10.3 Career/Job Search Metrics
+
+#### 10.3.1 Portfolio Quality Metrics
+
+| Aspect | Target | Measurement |
+|--------|--------|-------------|
+| **Live Demo Availability** | 99%+ uptime | Railway monitoring (Week 6+) |
+| **Demo Video Quality** | Professional, < 5 min | Video recorded, uploaded (Week 6) |
+| **GitHub Stars** | Nice to have (not required) | GitHub repo metrics |
+| **LinkedIn Post Engagement** | ≥ 10 reactions | LinkedIn analytics (Week 6) |
+| **Resume Updated** | Yes | Resume includes project (Week 6) |
+
+#### 10.3.2 Job Application Metrics
+
+| Metric | Target | Timeline | Measurement |
+|--------|--------|----------|-------------|
+| **Job Applications Submitted** | 30+ | Week 6 | Application tracker |
+| **Phone Screen Rate** | ≥ 20% | Weeks 7-8 | 6+ phone screens from 30 applications |
+| **Technical Interview Rate** | ≥ 50% of phone screens | Weeks 8-10 | 3+ technical rounds |
+| **Onsite Interview Rate** | ≥ 30% of technical | Weeks 10-12 | 1-2 onsite interviews |
+| **Offer Rate** | ≥ 1 offer | Weeks 12-14 | **SUCCESS: Job offer received** |
+
+**Primary Success Criterion:** Secure at least 1 job offer within 12 weeks of project start
+
+#### 10.3.3 Interview Performance Metrics
+
+| Skill Demonstrated | Evidence | Interview Value |
+|--------------------|----------|-----------------|
+| **Microservices Architecture** | 2 independent services with REST APIs | High |
+| **Security Expertise** | OAuth2/OIDC, JWT, MFA, audit logs | Critical for banking |
+| **Financial Systems Knowledge** | Double-entry ledger, BigDecimal, concurrency | Differentiator |
+| **Database Design** | Normalized schema, indexes, constraints | High |
+| **Concurrency Control** | Pessimistic locking, race condition prevention | Critical |
+| **Testing Discipline** | 80%+ coverage, integration tests, load tests | High |
+| **DevOps Skills** | CI/CD, Docker, cloud deployment | Medium |
+| **Problem Solving** | Can explain tradeoffs, design decisions | Critical |
+
+### 10.4 Weekly Progress KPIs
+
+#### 10.4.1 Development Velocity
+
+| Week | Target Hours | Target Features Complete | Code Coverage | Status Check |
+|------|-------------|--------------------------|---------------|--------------|
+| **Week 1** | 25-30 | Auth registration, login, JWT | ≥ 75% | • Daily commits<br>• Tests passing |
+| **Week 2** | 20-25 | Auth MFA, refresh tokens, deployed | ≥ 80% | • Deployed to Railway<br>• Live demo URL |
+| **Week 3** | 25-30 | Banking accounts, deposit, withdrawal | ≥ 75% | • Ledger working<br>• Tests passing |
+| **Week 4** | 30-35 | Banking transfer, idempotency, deployed | ≥ 80% | • Concurrency tests passing<br>• Integration complete |
+| **Week 5** | 15-20 | Documentation, testing, polish | ≥ 80% | • All docs complete<br>• Load tests passing |
+| **Week 6** | 10-15 | Job applications, interview prep | N/A | • 30 applications<br>• Demo ready |
+
+**Weekly Burn-Down Target:**
+- Week 1: 90% of Week 1 tasks complete
+- Week 2: 90% of Week 2 tasks complete
+- ...
+- Week 6: 100% of all tasks complete
+
+### 10.5 Quality Gates
+
+#### 10.5.1 Cannot Proceed to Next Week If:
+
+| Gate | Criterion | Consequences if Failed |
+|------|-----------|------------------------|
+| **Week 1 → Week 2** | • Auth service running<br>• Registration/login working<br>• ≥ 75% test coverage | Delay Week 2 start until fixed |
+| **Week 2 → Week 3** | • MFA working<br>• Deployed to Railway<br>• ≥ 80% test coverage | Cannot start banking service |
+| **Week 3 → Week 4** | • Account management working<br>• Ledger implemented<br>• ≥ 75% test coverage | Cannot implement transfer |
+| **Week 4 → Week 5** | • Transfer working<br>• Concurrency safe<br>• Deployed to Railway<br>• ≥ 80% test coverage | Cannot finalize documentation |
+| **Week 5 → Week 6** | • Documentation complete<br>• Demo script working<br>• Load tests passing | Cannot start job applications |
+| **Week 6 → Job Search** | • Live demo working<br>• Resume updated<br>• Interview answers prepared | Not ready for interviews |
+
+### 10.6 Final Success Declaration
+
+**Project is considered SUCCESSFUL when ALL of the following are met:**
+
+#### 10.6.1 Technical Criteria (100% Required)
+- [ ] Both services deployed and accessible via HTTPS
+- [ ] All P0 features implemented and tested
+- [ ] Test coverage ≥ 80% (line), ≥ 70% (branch)
+- [ ] Zero HIGH/CRITICAL security vulnerabilities
+- [ ] Load test passing (50 concurrent users, < 500ms p95)
+- [ ] Concurrency tests passing (zero race conditions)
+- [ ] Data integrity verified (ledger balanced)
+- [ ] Demo script works end-to-end in < 5 minutes
+
+#### 10.6.2 Documentation Criteria (100% Required)
+- [ ] README with quick start guide
+- [ ] Architecture diagram published
+- [ ] API documentation (OpenAPI/Swagger)
+- [ ] Postman collection with tests
+- [ ] Demo video uploaded (< 5 min)
+
+#### 10.6.3 Career Criteria (Primary Goal)
+- [ ] Resume updated with project
+- [ ] LinkedIn updated with project
+- [ ] 30+ job applications submitted
+- [ ] Interview preparation complete (answers ready)
+
+**ULTIMATE SUCCESS:** Job offer received using this project as portfolio piece
+
+### 10.7 Acceptance Testing Protocol
+
+**Final Acceptance Test (Before declaring project complete):**
+
+```bash
+# 1. Fresh clone (simulate new environment)
+git clone https://github.com/yourusername/distributed-banking-system
+cd distributed-banking-system
+
+# 2. Start services
+docker-compose up -d
+
+# 3. Wait for services to be healthy
+./scripts/wait-for-health.sh
+
+# 4. Run demo script
+./scripts/demo.sh
+
+# Expected output:
+# ✓ User registered successfully
+# ✓ User logged in (JWT received)
+# ✓ MFA enabled (QR code generated)
+# ✓ Account created (balance: $0.00)
+# ✓ Deposit successful (balance: $1000.00)
+# ✓ Transfer successful (from balance: $500.00, to balance: $500.00)
+# ✓ Transaction history retrieved (2 entries)
+# ✓ Ledger balanced (debits = credits)
+#
+# Demo completed successfully in 4m 32s
+
+# 5. Run automated tests
+./scripts/run-all-tests.sh
+
+# Expected output:
+# Unit tests: 142 passed, 0 failed
+# Integration tests: 28 passed, 0 failed
+# E2E tests: 6 passed, 0 failed
+# Total coverage: 83.2% (line), 74.1% (branch)
+#
+# All tests passed ✓
+
+# 6. Verify live deployment
+curl https://auth-service.railway.app/actuator/health
+curl https://banking-service.railway.app/actuator/health
+
+# Expected: {"status":"UP"}
+
+# If all above pass: PROJECT ACCEPTED ✓
+```
+
+---
+
+## 11. APPENDICES
+
+### Appendix A: Technology Justification Matrix
+
+| Technology | Alternative | Chosen | Rationale |
+|------------|-------------|--------|-----------|
+| **Backend Language** | Python, Node.js, Go | **Java 21** | Type safety, BigDecimal for finance, Spring ecosystem maturity, industry standard for banking |
+| **Framework** | Micronaut, Quarkus, Ktor | **Spring Boot 3.4** | Largest ecosystem, Spring Security battle-tested, comprehensive documentation, easy hiring |
+| **Database** | MySQL, MongoDB, CockroachDB | **PostgreSQL 16** | ACID compliance, JSON support, mature, free managed tier (Neon) |
+| **Cache** | Memcached, Hazelcast | **Redis 7.2** | Data structures (Sets, Sorted Sets), TTL support, persistence options, free tier (Upstash) |
+| **Auth Pattern** | Basic JWT, Auth0, Keycloak | **Spring Authorization Server** | Own implementation = learning, OAuth2 standard, no vendor lock-in, interview talking point |
+| **Deployment** | Heroku, Vercel, AWS ECS | **Railway** | Generous free tier, automatic SSL, simple deployment, fast iteration |
+| **CI/CD** | GitLab CI, CircleCI, Jenkins | **GitHub Actions** | Free for public repos, integrated with GitHub, simple YAML config |
+| **Monitoring** | DataDog, New Relic, ELK | **Spring Actuator + Prometheus** | Free, industry standard format, sufficient for demo, can export to any system |
+
+### Appendix B: Glossary
+
+| Term | Definition |
+|------|------------|
+| **ACID** | Atomicity, Consistency, Isolation, Durability - database transaction properties |
+| **BCrypt** | Password hashing algorithm with configurable computational cost |
+| **BigDecimal** | Java class for arbitrary-precision decimal arithmetic (critical for finance) |
+| **Circuit Breaker** | Design pattern that prevents cascading failures in distributed systems |
+| **Double-Entry Ledger** | Accounting system where every transaction affects two accounts (debit and credit) |
+| **DTO** | Data Transfer Object - object that carries data between processes |
+| **Idempotency** | Property where multiple identical requests have same effect as single request |
+| **JWT** | JSON Web Token - compact, URL-safe token format for claims transfer |
+| **OAuth2** | Authorization framework (RFC 6749) for delegated access |
+| **OIDC** | OpenID Connect - identity layer on top of OAuth2 |
+| **ORM** | Object-Relational Mapping - technique for converting between object and relational models |
+| **Pessimistic Locking** | Database locking strategy where rows are locked before reading (SELECT FOR UPDATE) |
+| **TOTP** | Time-based One-Time Password (RFC 6238) - used for MFA |
+| **TPS** | Transactions Per Second - measure of system throughput |
+
+### Appendix C: Reference Architecture Diagrams
+
+#### C.1 Component Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    BANKING PLATFORM                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌────────────────────────┐    ┌─────────────────────────┐ │
+│  │   AUTH SERVICE         │    │   BANKING SERVICE       │ │
+│  ├────────────────────────┤    ├─────────────────────────┤ │
+│  │ • AuthController       │    │ • AccountController     │ │
+│  │ • UserController       │    │ • TransactionController │ │
+│  │ • MFAController        │    │ • TransferController    │ │
+│  ├────────────────────────┤    ├─────────────────────────┤ │
+│  │ • UserService          │    │ • AccountService        │ │
+│  │ • JwtService           │    │ • TransactionService    │ │
+│  │ • MFAService           │    │ • TransferService       │ │
+│  │ • AuditLogService      │    │ • LedgerService         │ │
+│  ├────────────────────────┤    ├─────────────────────────┤ │
+│  │ • UserRepository       │    │ • AccountRepository     │ │
+│  │ • RoleRepository       │    │ • TransactionRepository │ │
+│  │ • RefreshTokenRepo     │    │ • LedgerEntryRepository │ │
+│  │ • AuditLogRepository   │    │                         │ │
+│  └────────────────────────┘    └─────────────────────────┘ │
+│           │                              │                  │
+│           └──────────────┬───────────────┘                  │
+│                          │                                  │
+└──────────────────────────┼──────────────────────────────────┘
+                           │
+                ┌──────────┴──────────┐
+                │                     │
+         ┌──────▼──────┐      ┌──────▼──────┐
+         │ PostgreSQL  │      │   Redis     │
+         │  (Neon)     │      │  (Upstash)  │
+         └─────────────┘      └─────────────┘
+```
+
+#### C.2 Deployment Diagram
+
+```
+┌───────────────────────────────────────────────────────────┐
+│                      INTERNET                             │
+└────────────────────┬──────────────────────────────────────┘
+                     │
+                     │ HTTPS
+                     ▼
+        ┌────────────────────────┐
+        │   Railway Edge         │
+        │   (Load Balancer)      │
+        └────────────────────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
+┌────────────────┐        ┌────────────────┐
+│ Auth Service   │        │ Banking Service│
+│ Container      │        │ Container      │
+│ (512MB RAM)    │        │ (512MB RAM)    │
+│ Java 21 JRE    │        │ Java 21 JRE    │
+└────────────────┘        └────────────────┘
+        │                         │
+        └────────────┬────────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
+┌────────────────┐        ┌────────────────┐
+│ Neon PostgreSQL│        │ Upstash Redis  │
+│ (500MB)        │        │ (10K cmds/day) │
+│ Multi-region   │        │ Global         │
+└────────────────┘        └────────────────┘
+```
+
+### Appendix D: API Request/Response Examples
+
+#### D.1 Complete User Journey
+
+```bash
+# Step 1: Register User
+curl -X POST https://auth-service.railway.app/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "alice@example.com",
+    "password": "SecureP@ssw0rd",
+    "firstName": "Alice",
+    "lastName": "Johnson"
+  }'
+
+# Response:
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "alice@example.com",
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "createdAt": "2026-02-10T10:30:00Z"
+}
+
+# Step 2: Login
+curl -X POST https://auth-service.railway.app/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "alice@example.com",
+    "password": "SecureP@ssw0rd"
+  }'
+
+# Response:
+{
+  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJlbWFpbCI6ImFsaWNlQGV4YW1wbGUuY29tIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3MDc1NjEwMDAsImV4cCI6MTcwNzU2MTkwMH0.signature",
+  "refreshToken": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "expiresIn": 900,
+  "tokenType": "Bearer"
+}
+
+# Step 3: Create Account
+curl -X POST https://banking-service.railway.app/api/v1/accounts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGc..." \
+  -d '{
+    "accountType": "SAVINGS",
+    "currency": "USD"
+  }'
+
+# Response:
+{
+  "accountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+  "accountNumber": "ACC1707561234567",
+  "accountType": "SAVINGS",
+  "balance": 0.0000,
+  "currency": "USD",
+  "status": "ACTIVE",
+  "createdAt": "2026-02-10T10:35:00Z"
+}
+
+# Step 4: Deposit Money
+curl -X POST https://banking-service.railway.app/api/v1/accounts/8d0f7780-8536-51ef-a55c-f18gd2g01bf8/deposit \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGc..." \
+  -H "Idempotency-Key: txn:550e8400:deposit-001" \
+  -d '{
+    "amount": 1000.00,
+    "currency": "USD",
+    "description": "Initial deposit"
+  }'
+
+# Response:
+{
+  "transactionId": "9e1g8891-9647-62fg-b66d-g29he3h12cg9",
+  "accountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+  "transactionType": "DEPOSIT",
+  "amount": 1000.0000,
+  "currency": "USD",
+  "status": "COMPLETED",
+  "balanceAfter": 1000.0000,
+  "description": "Initial deposit",
+  "completedAt": "2026-02-10T10:36:15Z"
+}
+
+# Step 5: Transfer Money
+curl -X POST https://banking-service.railway.app/api/v1/transfers \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGc..." \
+  -H "Idempotency-Key: txn:550e8400:transfer-001" \
+  -d '{
+    "fromAccountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+    "toAccountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "amount": 500.00,
+    "currency": "USD",
+    "description": "Transfer to checking"
+  }'
+
+# Response:
+{
+  "transactionId": "a2f9h902-0758-73gh-c77e-h30if4i23dh0",
+  "status": "COMPLETED",
+  "fromAccount": {
+    "accountId": "8d0f7780-8536-51ef-a55c-f18gd2g01bf8",
+    "balanceAfter": 500.0000
+  },
+  "toAccount": {
+    "accountId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "balanceAfter": 500.0000
+  },
+  "amount": 500.0000,
+  "currency": "USD",
+  "description": "Transfer to checking",
+  "completedAt": "2026-02-10T10:37:42Z"
+}
+```
+
+### Appendix E: Interview Preparation
+
+#### E.1 The 3 Core Stories
+
+**Story 1: Architecture Decision (Java vs Polyglot)**
+> "I initially considered a polyglot architecture with Python for the banking service to demonstrate broader skills. However, I chose Java for both services because: (1) Type safety is critical for financial systems—compile-time checks prevent entire classes of bugs; (2) Java's BigDecimal provides precise decimal arithmetic needed for money, while Python's float can introduce rounding errors; (3) Spring Security is the industry standard for OAuth2, with 15+ years of battle-testing; (4) In production banking, consistency and reliability trump variety. This decision reduced development time by 2 weeks and eliminated integration complexity."
+
+**Story 2: Hard Technical Problem (Race Conditions)**
+> "The hardest problem was preventing race conditions in concurrent transfers. If two transfers happen simultaneously from the same account, both could check the balance, both succeed, and overdraw the account—the bank loses money. I solved this with pessimistic locking using SELECT FOR UPDATE in PostgreSQL. When a transfer starts, it locks the account row until the transaction completes, forcing concurrent requests to wait. I verified this with tests simulating 100 parallel $600 transfers from a $1000 account—only one succeeded, the rest failed with insufficient funds. The tradeoff is reduced throughput, but for banking, correctness is non-negotiable."
+
+**Story 3: Pragmatic Tradeoff (Infrastructure Cost)**
+> "I used production patterns (double-entry ledger, idempotency, OAuth2) but optimized infrastructure costs. Instead of $2,000/month AWS, I used free tiers: Neon PostgreSQL, Upstash Redis, Railway deployment. The code is identical to what would run at scale—the only difference is single instances vs clusters. In an interview, I can explain the migration path: Neon → RDS Multi-AZ, Upstash → ElastiCache Cluster, Railway → EKS. This shows I understand both the patterns and the pragmatism needed in startups—build for production patterns, deploy for current budget, scale when needed."
+
+#### E.2 Common Interview Questions & Answers
+
+**Q: "Why microservices instead of a monolith?"**
+A: "For this project, microservices demonstrate understanding of distributed systems—separation of concerns, independent scaling, fault isolation. In reality, a monolith would work fine at this scale. But the architecture shows I can build systems that scale. The auth and banking domains are legitimately separate—different data models, different scaling needs, different security requirements. If this were production with 3 services, I'd question microservices. With 10+ services planned, it makes sense."
+
+**Q: "How would you handle distributed transactions?"**
+A: "Currently, I don't have distributed transactions—each service owns its data. For operations spanning services, I'd use the Saga pattern: break long transactions into local transactions with compensating actions. For example, a payment might be: (1) Reserve funds in banking service, (2) Process payment in payment service, (3) If payment fails, release funds (compensation). I'd publish events to Kafka for each step, maintain a state machine, and handle failures with idempotency. I implemented idempotency in this project as preparation for Saga."
+
+**Q: "What happens if Redis goes down?"**
+A: "Sessions would be lost—users would need to re-login. Rate limiting would reset—briefly allowing more requests. Idempotency would be lost—duplicate requests could process twice for ~24 hours of transactions. In production, I'd use Redis Cluster with persistence and replication. For critical idempotency, I'd also store keys in PostgreSQL with async write-through to Redis. The Redis failure mode is degraded experience, not data loss—the database is source of truth."
+
+**Q: "How do you ensure the ledger stays balanced?"**
+A: "I have a PostgreSQL function that runs daily: it sums all debits and credits in the ledger and compares to account balances. The invariant is: SUM(CREDIT entries) - SUM(DEBIT entries) = SUM(account balances). If there's a discrepancy, I'd alert immediately and investigate. The double-entry ledger is immutable—entries are never updated or deleted—so I can trace the exact transaction that broke the invariant. I also have database constraints to prevent negative balances."
+
+**Q: "What would you do differently in production?"**
+A: "I'd add: (1) Service mesh (Istio) for mTLS between services and better observability, (2) Multi-region deployment for disaster recovery, (3) Read replicas for database to scale queries, (4) Kafka for event sourcing and audit trail, (5) HashiCorp Vault for secret rotation, (6) Chaos engineering (Chaos Mesh) to test failure modes, (7) Comprehensive alerting with PagerDuty, (8) Load balancing with health checks and circuit breakers, (9) API Gateway for rate limiting and authentication at the edge, (10) Production monitoring with DataDog or New Relic with SLA dashboards."
+
+**Q: "Why should we hire you based on this project?"**
+A: "This project demonstrates I can design and build production-grade distributed systems from scratch. I made deliberate architectural decisions—choosing pessimistic locking over optimistic because correctness matters more than throughput in banking, implementing double-entry ledger because it's how real financial systems work, not just incrementing a balance field. I can explain every tradeoff. More importantly, I shipped it—it's live, tested, and documented. I'm ready to do this at scale on your team."
+
+**Q: "Why a monorepo instead of separate repositories?"**
+A: "I used a monorepo structure because the services are tightly coupled through API contracts, and as a solo developer, the atomic commit workflow was more important than repo independence. When I change an API contract, I can update both the provider and consumer in a single commit—no version coordination needed. In production with multiple teams, I'd evaluate splitting based on team ownership boundaries and release cadences. Modern tools like Nx make monorepos production-grade even at Google scale."
+
+---
+
+## DOCUMENT CONTROL
+
+**Document Version:** 1.0  
+**Last Updated:** February 10, 2026  
+**Document Owner:** Project Technical Lead  
+**Approval Status:** Approved for Implementation  
+**Next Review Date:** Upon project completion or major scope change
+
+**Change Log:**
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 0.1 | 2026-02-10 | Technical Lead | Initial draft |
+| 1.0 | 2026-02-10 | Technical Lead | Final approved version |
+| 1.1 | 2026-02-10 | Technical Lead | Added: Frontend Stack (React/Vite), Foreign Data Wrapper for cross-service integrity, Interview Q&A (hire question, monorepo explanation), Updated Week 5 schedule for UI development |
+
+---
+
+## ACKNOWLEDGMENTS
+
+This project plan incorporates best practices from:
+- Spring Boot documentation and reference architecture
+- Martin Fowler's microservices patterns
+- OAuth2/OIDC specifications (RFC 6749, RFC 7519, RFC 6238)
+- OWASP security guidelines
+- PostgreSQL documentation on transaction isolation
+- Industry best practices from fintech companies
+
+---
+
+**END OF FORMAL REPORT**
+
+

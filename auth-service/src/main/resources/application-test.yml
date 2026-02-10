@@ -1,0 +1,69 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS auth
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        default_schema: auth
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7VJTUt9Us8cKj
+    MzEtUDc2s3PQWnPPzeLCDdB4f0DqTutLfNLRdZ1wNq8YPQJ7xHGJocWAqHPt37Pj
+    lfMYDDC4NOLAMpVFIxEHTGNbKOBXYtXvkZqfEE+BaSHRz5zpYRE9C2R6RkzC4svo
+    vNDPdfG+LTpvALNBLWr1z4L37mHj0US1wshAOuMB6RBczRTZhUhMGOlrR+DaO7Iq
+    bPe9wYOA0bMrEmiAAtF5JB8jzpPIbQyiIl1+hewfwqChTt7EpFIepNLjuNLEV4ms
+    LPjyMo0qPLCTWZCzjPaysyHcUHi0eyNPRHho50WTjvmtc+3S4e8n5kGdNVoLY1Mf
+    vNPLSABtAgMBAAECggEAKIBGrbCSW2O1yOyQW9nvDUkA5EdsS58Q7US7bvM4iWpu
+    DIBwCXur7/VuKnhn/HUhURLzj/JNozynSChqYyG+CvL+ZLy82LUE3ZIBkSdv/vFL
+    Ft+VvvRtf1EcsmoqenkZl7aN7HD7DJeXBoz5tyVQKuH17WW0fsi9StGtCcUl+H6K
+    zV9Gif0Kj0uLQbCg3THRvKuueBTwCTdjoP0PwaNADgSWb3hJPeLMm/yII4tIMGbO
+    w+xd9wJRl+ZN9nkNtQMxszFGdKjedB6goYLQuP0WRZx+YtykaVJdM75bDUvsQar4
+    9Pc21T7IQDDxsmCHDgZ8f0qly3NeJ9T5mXrcLXasAQKBgQDrSqb1pVMhW4+Vwykh
+    P8Lef7JQGC8MLb7NRqNBK1W5P85vljiDuobDNOc7W1ib8w4X6moLRPdqwJmMELg0
+    xskNgHfTwKPkHh3qDz68Ertm8RZIHVdYQqL0oAw/2pINitCM0XUEV8Rg9OfCpQBY
+    fMRJUQns/G4Qn+I12X0sL0tUbQKBgQDL0NAOBonlGq9PXGLwX5KLSqWcGkJHsXhT
+    sVECgNLfBOIaoHm/WdhYAF/a8fwdHK0Fd7cSXdcn22GMYWxsSLnoxIQea4xaAH7A
+    xWmHByJ/cP6aFgpZoCSLT7/5xnPTFtySjGXyPgkg4VeHhmkNXBGCIbUMDO4k8Nmo
+    PlKfx24gAQKBgQCiLi1Yq3FVTxf/AFpCM4kmFMaRPgmHMRg1N+PYvS8S8R5uK/T0
+    vEF4CD+bU5TxMYI4MwVLI1a5F7Yy3Hdxcypg5XGnTTM4mELgn5NeJWfADy9G8FqA
+    TIXHQ18yY6GJGlUEYpiFiDIJQwKcNez1OA9SxUI0nPb/aD3X9k9e29LhJQKBgD7r
+    JlPS1owNYXfuGXhEj/vGpxCrOaIdc1ij/EJh3hz4ZCLEl2oNvbfiGexZJ7VQ8Pld
+    fD8Man1pQhBgX7Z8g1p9r0M/o8MBxdI8PmNvPjeJ890MLMwS7aY9VgD0Lo4Rtqfx
+    Ad8fzpaW6fydma7AZNyDo4RQlgHfmp7W2FjpWTABAoGBAMlvKwVjZDCBkf9zl8D4
+    borH4vq1MXogSE5uYn4WWPuv5x167sSodIi3RAD1S5cMYagnMi3NMxLhbxjrfZ7K
+    bcDf9Cd9gYeYZlgUbLPdGqNONShV8L3cE4DXvT5W3IjbPMYEB1Hq9Ci7P8BLTsO+
+    meYLroUfCns7F4yIKfOBc9iy
+    -----END PRIVATE KEY-----
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxLVA3
+    NrNz0FpzzM3iwg3QeH9A6k7rS3zS0XWdcDavGD0Ce8RxiaHFgKhz7d+z45XzGAww
+    uDTiwDKVRSMRB0xjWyjgV2LV75GanxBPgWkh0c+c6WERPQtkekZMwuLL6LzQz3Xx
+    vi06bwCzQS1q9c+C9+5h49FEtcLIQDrjAekQXM0U2YVITBjpa0fg2juyKmz3vcGD
+    gNGzKxJogALReSQfI86TyG0MoiJdfIXsH8KgoU7exKRSHqTS47jSxFeJrCz48jKN
+    KjywkMmQs4z2srMh3FB4tHsjT0R4aOdFk475rXPt0uHvJ+ZBnTVaC2NTH7zTy0gA
+    bQIDAQAB
+    -----END PUBLIC KEY-----
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+
+logging:
+  level:
+    com.banking.auth: DEBUG
