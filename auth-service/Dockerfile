@@ -39,5 +39,6 @@ USER appuser
 # Expose port
 EXPOSE 8080
 
+# Force rebuild - v2
 # Run the application with JVM options
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
