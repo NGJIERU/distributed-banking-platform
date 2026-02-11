@@ -79,6 +79,7 @@ public class JwtService {
 
     private PrivateKey loadPrivateKey(String pem) throws Exception {
         String privateKeyContent = pem
+                .replace("\\n", "\n")
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
@@ -90,6 +91,7 @@ public class JwtService {
 
     private PublicKey loadPublicKey(String pem) throws Exception {
         String publicKeyContent = pem
+                .replace("\\n", "\n")
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
