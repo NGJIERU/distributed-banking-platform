@@ -1,8 +1,10 @@
 package com.banking.auth.controller;
 
 import com.banking.auth.dto.request.LoginRequest;
+import com.banking.auth.dto.request.MfaVerifyRequest;
 import com.banking.auth.dto.request.RegisterRequest;
 import com.banking.auth.dto.response.AuthResponse;
+import com.banking.auth.dto.response.LoginResponse;
 import com.banking.auth.dto.response.UserResponse;
 import com.banking.auth.service.AuthService;
 import com.banking.auth.service.UserService;
@@ -36,10 +38,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user and get JWT tokens")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    @Operation(summary = "Authenticate user and get JWT tokens (may require MFA)")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("Login request received for email: {}", request.getEmail());
-        AuthResponse response = authService.login(request);
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login/mfa")
+    @Operation(summary = "Verify MFA code and complete login")
+    public ResponseEntity<AuthResponse> verifyMfa(@Valid @RequestBody MfaVerifyRequest request) {
+        log.info("MFA verification request received");
+        AuthResponse response = authService.verifyMfaAndLogin(request);
         return ResponseEntity.ok(response);
     }
 

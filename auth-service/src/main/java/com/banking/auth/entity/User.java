@@ -42,6 +42,9 @@ public class User {
     @Column(name = "mfa_secret", length = 255)
     private String mfaSecret;
 
+    @Column(name = "mfa_backup_codes", columnDefinition = "TEXT")
+    private String mfaBackupCodes;
+
     @Column(name = "account_locked")
     @Builder.Default
     private Boolean accountLocked = false;

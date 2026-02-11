@@ -21,10 +21,12 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "secretKey", 
-                "mySecretKeyForDevelopmentOnlyMustBeAtLeast256BitsLongForHS256Algorithm");
+        ReflectionTestUtils.setField(jwtService, "privateKeyPem", "");
+        ReflectionTestUtils.setField(jwtService, "publicKeyPem", "");
         ReflectionTestUtils.setField(jwtService, "accessTokenExpiration", 900000L);
         ReflectionTestUtils.setField(jwtService, "refreshTokenExpiration", 604800000L);
+        ReflectionTestUtils.setField(jwtService, "issuer", "test-issuer");
+        jwtService.init();
 
         Role userRole = Role.builder()
                 .id(UUID.randomUUID())

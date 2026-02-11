@@ -1,0 +1,636 @@
+{
+  "info": {
+    "name": "Banking Platform API",
+    "description": "API collection for Distributed Banking Microservices Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mfaToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth Service",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Register User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.mfaRequired === false && jsonData.authResponse) {",
+                      "    pm.collectionVariables.set('accessToken', jsonData.authResponse.accessToken);",
+                      "    pm.collectionVariables.set('refreshToken', jsonData.authResponse.refreshToken);",
+                      "} else if (jsonData.mfaRequired === true) {",
+                      "    pm.collectionVariables.set('mfaToken', jsonData.mfaToken);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "Login with MFA",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.accessToken) {",
+                      "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                      "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"mfaToken\": \"{{mfaToken}}\",\n  \"code\": \"123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login/mfa",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login", "mfa"]
+                }
+              }
+            },
+            {
+              "name": "Refresh Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.accessToken) {",
+                      "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                      "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/refresh",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "refresh"]
+                }
+              }
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/logout",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "logout"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "MFA",
+          "item": [
+            {
+              "name": "Setup MFA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/mfa/setup",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "mfa", "setup"]
+                }
+              }
+            },
+            {
+              "name": "Verify and Enable MFA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/mfa/verify",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "mfa", "verify"]
+                }
+              }
+            },
+            {
+              "name": "Disable MFA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/mfa/disable",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "mfa", "disable"]
+                }
+              }
+            },
+            {
+              "name": "Get MFA Status",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/mfa/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "mfa", "status"]
+                }
+              }
+            },
+            {
+              "name": "Regenerate Backup Codes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"123456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/mfa/backup-codes/regenerate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "mfa", "backup-codes", "regenerate"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin - Audit Logs",
+          "item": [
+            {
+              "name": "Get All Audit Logs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit"],
+                  "query": [
+                    {"key": "page", "value": "0"},
+                    {"key": "size", "value": "20"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Audit Logs by Type",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit/by-type/LOGIN_SUCCESS?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit", "by-type", "LOGIN_SUCCESS"],
+                  "query": [
+                    {"key": "page", "value": "0"},
+                    {"key": "size", "value": "20"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Audit Logs by User",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit/by-user/{{userId}}?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit", "by-user", "{{userId}}"],
+                  "query": [
+                    {"key": "page", "value": "0"},
+                    {"key": "size", "value": "20"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Audit Logs by Date Range",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit/by-date-range?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit", "by-date-range"],
+                  "query": [
+                    {"key": "startDate", "value": "2026-01-01T00:00:00"},
+                    {"key": "endDate", "value": "2026-12-31T23:59:59"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Audit Statistics",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit/statistics",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit", "statistics"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health",
+          "item": [
+            {
+              "name": "Health Check",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/actuator/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["actuator", "health"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Banking Service",
+      "item": [
+        {
+          "name": "Accounts",
+          "item": [
+            {
+              "name": "Create Account",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountType\": \"SAVINGS\",\n  \"currency\": \"USD\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "accounts"]
+                }
+              }
+            },
+            {
+              "name": "Get My Accounts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "accounts"]
+                }
+              }
+            },
+            {
+              "name": "Get Account by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts/{{accountId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "accounts", "{{accountId}}"]
+                }
+              }
+            },
+            {
+              "name": "Get Account Balance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/accounts/{{accountId}}/balance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "accounts", "{{accountId}}", "balance"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "Deposit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"amount\": 1000.00,\n  \"description\": \"Initial deposit\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/deposit",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "transactions", "deposit"]
+                }
+              }
+            },
+            {
+              "name": "Withdraw",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"amount\": 100.00,\n  \"description\": \"ATM withdrawal\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/withdraw",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "transactions", "withdraw"]
+                }
+              }
+            },
+            {
+              "name": "Transfer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sourceAccountId\": \"{{accountId}}\",\n  \"targetAccountId\": \"{{targetAccountId}}\",\n  \"amount\": 50.00,\n  \"description\": \"Transfer to savings\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/transfer",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "transactions", "transfer"]
+                }
+              }
+            },
+            {
+              "name": "Get Transaction History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/transactions/account/{{accountId}}?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "transactions", "account", "{{accountId}}"],
+                  "query": [
+                    {"key": "page", "value": "0"},
+                    {"key": "size", "value": "20"}
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health",
+          "item": [
+            {
+              "name": "Health Check",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "http://localhost:8081/actuator/health",
+                  "host": ["http://localhost:8081"],
+                  "path": ["actuator", "health"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

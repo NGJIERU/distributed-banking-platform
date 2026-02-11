@@ -3,6 +3,7 @@ package com.banking.auth.controller;
 import com.banking.auth.dto.request.LoginRequest;
 import com.banking.auth.dto.request.RegisterRequest;
 import com.banking.auth.dto.response.AuthResponse;
+import com.banking.auth.dto.response.LoginResponse;
 import com.banking.auth.dto.response.UserResponse;
 import com.banking.auth.exception.InvalidCredentialsException;
 import com.banking.auth.exception.UserAlreadyExistsException;
@@ -111,14 +112,15 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/auth/login - Success")
+    @DisplayName("POST /api/v1/auth/login - Success (no MFA)")
     void testLogin_Success() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .email("alice@example.com")
                 .password("SecureP@ssw0rd")
                 .build();
 
-        AuthResponse response = AuthResponse.of("access-token", "refresh-token", 900L);
+        AuthResponse authResponse = AuthResponse.of("access-token", "refresh-token", 900L);
+        LoginResponse response = LoginResponse.success(authResponse);
 
         when(authService.login(any(LoginRequest.class))).thenReturn(response);
 
@@ -126,9 +128,30 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value("access-token"))
-                .andExpect(jsonPath("$.refreshToken").value("refresh-token"))
-                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+                .andExpect(jsonPath("$.mfaRequired").value(false))
+                .andExpect(jsonPath("$.authResponse.accessToken").value("access-token"))
+                .andExpect(jsonPath("$.authResponse.tokenType").value("Bearer"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auth/login - MFA Required")
+    void testLogin_MfaRequired() throws Exception {
+        LoginRequest request = LoginRequest.builder()
+                .email("alice@example.com")
+                .password("SecureP@ssw0rd")
+                .build();
+
+        LoginResponse response = LoginResponse.requireMfa("mfa-token-123");
+
+        when(authService.login(any(LoginRequest.class))).thenReturn(response);
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mfaRequired").value(true))
+                .andExpect(jsonPath("$.mfaToken").value("mfa-token-123"))
+                .andExpect(jsonPath("$.authResponse").doesNotExist());
     }
 
     @Test

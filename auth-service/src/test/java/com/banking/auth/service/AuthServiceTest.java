@@ -2,6 +2,7 @@ package com.banking.auth.service;
 
 import com.banking.auth.dto.request.LoginRequest;
 import com.banking.auth.dto.response.AuthResponse;
+import com.banking.auth.dto.response.LoginResponse;
 import com.banking.auth.entity.RefreshToken;
 import com.banking.auth.entity.Role;
 import com.banking.auth.entity.User;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -40,10 +43,22 @@ class AuthServiceTest {
     private JwtService jwtService;
 
     @Mock
+    private MfaService mfaService;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
     private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, String> valueOperations;
 
     @InjectMocks
     private AuthService authService;
@@ -78,24 +93,43 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Should successfully login with valid credentials")
-    void testLogin_Success() {
+    @DisplayName("Should successfully login with valid credentials (no MFA)")
+    void testLogin_Success_NoMfa() {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(mfaService.isMfaEnabled(any(User.class))).thenReturn(false);
         when(jwtService.generateAccessToken(any(User.class))).thenReturn("access-token");
         when(jwtService.getAccessTokenExpiration()).thenReturn(900000L);
         when(jwtService.getRefreshTokenExpiration()).thenReturn(604800000L);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(i -> i.getArgument(0));
 
-        AuthResponse response = authService.login(loginRequest);
+        LoginResponse response = authService.login(loginRequest);
 
-        assertThat(response.getAccessToken()).isEqualTo("access-token");
-        assertThat(response.getRefreshToken()).isNotNull();
-        assertThat(response.getTokenType()).isEqualTo("Bearer");
-        assertThat(response.getExpiresIn()).isEqualTo(900L);
+        assertThat(response.isMfaRequired()).isFalse();
+        assertThat(response.getAuthResponse()).isNotNull();
+        assertThat(response.getAuthResponse().getAccessToken()).isEqualTo("access-token");
+        assertThat(response.getAuthResponse().getTokenType()).isEqualTo("Bearer");
 
         verify(userService).recordSuccessfulLogin(testUser);
         verify(refreshTokenRepository).save(any(RefreshToken.class));
+    }
+
+    @Test
+    @DisplayName("Should return MFA required when user has MFA enabled")
+    void testLogin_MfaRequired() {
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(mfaService.isMfaEnabled(any(User.class))).thenReturn(true);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+        LoginResponse response = authService.login(loginRequest);
+
+        assertThat(response.isMfaRequired()).isTrue();
+        assertThat(response.getMfaToken()).isNotNull();
+        assertThat(response.getAuthResponse()).isNull();
+
+        verify(userService, never()).recordSuccessfulLogin(any());
+        verify(valueOperations).set(anyString(), anyString(), any());
     }
 
     @Test
