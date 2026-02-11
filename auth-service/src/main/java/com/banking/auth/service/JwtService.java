@@ -78,12 +78,19 @@ public class JwtService {
     }
 
     private PrivateKey loadPrivateKey(String pem) throws Exception {
+        log.info("Loading private key, input length: {}, first 50 chars: {}", 
+                pem.length(), pem.substring(0, Math.min(50, pem.length())));
         String privateKeyContent = pem
                 .replace("\\n", "")
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "")
                 .replaceAll("[^A-Za-z0-9+/=]", "");
+        log.info("Cleaned private key length: {}, first 50 chars: {}", 
+                privateKeyContent.length(), privateKeyContent.substring(0, Math.min(50, privateKeyContent.length())));
+        if (privateKeyContent.isEmpty()) {
+            throw new IllegalArgumentException("Private key is empty after cleaning");
+        }
         byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
